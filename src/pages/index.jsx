@@ -6,7 +6,7 @@ export default function Home() {
 					className='flex h-1/2 md:w-1/2 md:h-full justify-around items-center'
 					style={{ background: 'linear-gradient(112.1deg, rgb(14, 50, 108) 11.4%, #20242f 70.2%)' }}>
 					<div className='container mx-auto p-6 md:w-3/4 text-center'>
-						<img src='/logo.png' alt='' className='w-[150px] md:w-[170px] mb-5 mx-auto' />
+						<img src='/logo-xl.png' alt='' className='w-[150px] md:w-[170px] mb-5 mx-auto' />
 						{/* <h1 className='text-white font-bold text-4xl font-sans mb-4'>Bespoke audits</h1> */}
 					</div>
 				</div>
