@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+	color: #252525;
+	font-family: 'Raleway', sans-serif;
+}
+
+
