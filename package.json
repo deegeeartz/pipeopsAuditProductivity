@@ -1,0 +1,11 @@
+{
+  "name": "pipeops-audit-pro",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "cd ./frontend && yarn run dev",
+    "build:frontend": "cd ./frontend && yarn run build",
+    "dev:backend": "cd ./backend && yarn run dev",
+    "start:backend": "cd ./backend && yarn run start"
+  }
+}
