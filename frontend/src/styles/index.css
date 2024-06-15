@@ -4,7 +4,28 @@
 
 body {
 	color: #252525;
-	font-family: 'Raleway', sans-serif;
+	font-family: "Raleway", sans-serif;
 }
 
+.btn_primary {
+	font-size: 14px;
+	padding: 7px 26px;
+	border-radius: 6px;
+	color: #fff;
+	background: #252525;
+	@apply select-none transition-all hover:opacity-85;
+}
 
+/*!----- SECTIONS -------*/
+.datatable {
+	border-radius: 2px !important;
+}
+
+.rdt_TableHeadRow {
+	background: #f5f5f5 !important;
+	font-weight: bold;
+	text-transform: uppercase;
+	border-top-width: 1px;
+	border-top-color: rgba(0, 0, 0, 0.12);
+	border-top-style: solid;
+}

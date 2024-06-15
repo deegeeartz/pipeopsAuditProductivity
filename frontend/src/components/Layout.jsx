@@ -108,10 +108,10 @@ const Layout = ({ children }) => {
 						<RiMenuLine />
 					</button>
 
-					<ol class='ms-4 md:ms-0 flex items-center whitespace-nowrap capitalize'>
-						<li class='text-sm text-gray-600'>{getHeaderText()[0]}</li>
-						<RiArrowDropRightLine class='text-sm text-gray-600' />
-						<li class='text-sm font-semibold text-gray-600 truncate' aria-current='page'>
+					<ol className='ms-4 md:ms-0 flex items-center whitespace-nowrap capitalize'>
+						<li className='text-sm text-gray-600'>{getHeaderText()[0]}</li>
+						<RiArrowDropRightLine className='text-sm text-gray-600' />
+						<li className='text-sm font-semibold text-gray-600 truncate' aria-current='page'>
 							{getHeaderText()[1] ?? 'Dashboard'}
 						</li>
 					</ol>
