@@ -1,5 +1,6 @@
 import Layout from '@/components/Layout';
 import dynamic from 'next/dynamic';
+import { RiAddFill } from 'react-icons/ri';
 
 const SurveyTable = dynamic(() => import('@/components/SurveyTable'), { ssr: false });
 
@@ -7,9 +8,12 @@ const Surveys = () => {
 	return (
 		<Layout>
 			<div className='content p-6'>
-				<div className='mb-6 flex justify-between items-center'>
+				<div className='mb-7 flex justify-between items-center'>
 					<h1 className='font-bold text-lg text-[#222]'>Manage Surveys</h1>
-					<a className='btn_primary'>Create new</a>
+					<a className='btn_primary _flex'>
+						<RiAddFill className='mr-2 h-5 w-5' />
+						Create New
+					</a>
 				</div>
 
 				<div className='py-1 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
