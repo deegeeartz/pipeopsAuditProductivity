@@ -47,42 +47,42 @@ const Layout = ({ children }) => {
 				className={`fixed md:-translate-x-0 left-0 top-0 w-64 h-full bg-[#fff] p-4 z-50 transition-transform border-r border-gray-200 ${
 					sidebarOpen ? '-translate-x-0' : '-translate-x-full'
 				}`}>
-				<Link href='/admin' className='flex items-center pb-5'>
+				<Link href='/' className='flex items-center pb-5'>
 					<img src='/logo.png' alt='Logo' className='w-[80px] mx-auto' />
 				</Link>
 
 				<ul className='mt-4'>
-					<li className='mb-1 group'>
+					<li className={`mb-1 group ${pathname === '/admin' ? 'active' : ''}`}>
 						<Link
 							href='/admin'
-							className='pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-[#252525] hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white'>
+							className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
 							<RiHome4Line className='mr-3 text-lg' />
 							<span className='text-sm'>Dashboard</span>
 						</Link>
 					</li>
 
-					<li className='mb-1 group'>
+					<li className={`mb-1 group ${pathname === '/admin/surveys' ? 'active' : ''}`}>
 						<Link
 							href='/admin/surveys'
-							className='pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-[#252525] hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white'>
+							className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
 							<RiBook2Line className='mr-3 text-lg' />
 							<span className='text-sm'>Manage Surveys</span>
 						</Link>
 					</li>
 
-					<li className='mb-1 group'>
+					<li className={`mb-1 group ${pathname === '/admin/clients' ? 'active' : ''}`}>
 						<Link
-							href=''
-							className='pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-[#252525] hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white'>
+							href='/admin/clients'
+							className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
 							<RiUserStarLine className='mr-3 text-lg' />
 							<span className='text-sm'>Manage Clients</span>
 						</Link>
 					</li>
 
-					<li className='mb-1 group'>
+					<li className={`mb-1 group ${pathname === '/admin/inspectors' ? 'active' : ''}`}>
 						<Link
-							href=''
-							className='pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-[#252525] hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white'>
+							href='/admin/inspectors'
+							className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
 							<RiUserSearchLine className='mr-3 text-lg' />
 							<span className='text-sm'>Manage Inspectors</span>
 							<i className='ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90' />
