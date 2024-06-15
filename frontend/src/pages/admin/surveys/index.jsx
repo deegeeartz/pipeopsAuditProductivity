@@ -1,10 +1,15 @@
+import { useState } from 'react';
+import DeleteModal from '@/components/DeleteModal';
 import Layout from '@/components/Layout';
+import { Loader } from '@/components/Loader';
 import dynamic from 'next/dynamic';
 import { RiAddFill } from 'react-icons/ri';
 
-const SurveyTable = dynamic(() => import('@/components/SurveyTable'), { ssr: false });
+const SurveyTable = dynamic(() => import('@/components/SurveyTable'), { ssr: false, loading: Loader });
 
 const Surveys = () => {
+	const [openDelModal, setOpenDelModal] = useState(false);
+
 	return (
 		<Layout>
 			<div className='content p-6'>
@@ -18,7 +23,7 @@ const Surveys = () => {
 
 				<div className='py-1 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
 					<div className='py-3 px-4 flex justify-between items-center'>
-						<p className='text-[13px] font-semibold'>Total (2)</p>
+						<p className='text-[13px] font-semibold'>Total (4)</p>
 						<div></div>
 						<input
 							type='text'
@@ -27,9 +32,11 @@ const Surveys = () => {
 						/>
 					</div>
 
-					<SurveyTable />
+					<SurveyTable setOpenDelModal={setOpenDelModal} />
 				</div>
 			</div>
+
+			{openDelModal && <DeleteModal openModal={openDelModal} setOpenModal={setOpenDelModal} />}
 		</Layout>
 	);
 };
