@@ -1,7 +1,10 @@
-import { Badge } from 'flowbite-react';
-import DataTable from 'react-data-table-component';
 
-const SurveyTable = () => {
+import { Badge } from 'flowbite-react';
+import Link from 'next/link';
+import DataTable from 'react-data-table-component';
+import { RiDeleteBin4Fill, RiEdit2Fill, RiEyeFill } from 'react-icons/ri';
+
+const SurveyTable = ({ setOpenDelModal }) => {
 	const customStyles = {
 		rows: {
 			style: {
@@ -16,6 +19,83 @@ const SurveyTable = () => {
 		},
 	};
 
+	const ActionButtons = ({ id }) => {
+		const style =
+			'text-[17px] cursor-pointer rounded-sm p-1 text-[#252525] border border-gray-300 hover:bg-gray-200';
+		return (
+			<div className='flex gap-x-2.5'>
+				<Link href={'surveys/4655/edit'} className={`${style}`}>
+					<RiEyeFill />
+				</Link>
+				<Link href={'surveys/4655/edit'} className={`${style}`}>
+					<RiEdit2Fill />
+				</Link>
+				<div className={`${style}`} onClick={() => setOpenDelModal(true)}>
+					<RiDeleteBin4Fill />
+				</div>
+			</div>
+		);
+	};
+
+	const columns = [
+		{
+			name: 'Audit ID',
+			selector: (row) => '4655',
+			sortable: true,
+			minWidth: '0px',
+		},
+		{
+			name: 'Client',
+			selector: (row) => 'GSmith Ltd',
+			sortable: true,
+			minWidth: '110px',
+		},
+		{
+			name: 'Brand',
+			selector: (row) => 'GSmith Hostel NG',
+			sortable: true,
+			minWidth: true,
+			minWidth: '110px',
+		},
+		{
+			name: 'Campaign',
+			selector: (row) => '1st round 2023',
+			sortable: true,
+			minWidth: '120px',
+			hide: 'md',
+		},
+		{
+			name: 'Start Date',
+			selector: (row) => row.date,
+			sortable: true,
+			minWidth: '110px',
+		},
+		{
+			name: 'End Date',
+			selector: (row) => row.date,
+			sortable: true,
+			minWidth: '110px',
+		},
+		{
+			name: 'Status',
+			minWidth: '120px',
+			cell: () => {
+				const count = 3;
+				return (
+					<Badge color={count > 0 ? 'success' : 'failure'}>
+						{count}
+						{count > 1 ? ' Entries' : ' Entry'}
+					</Badge>
+				);
+			},
+		},
+		{
+			name: 'Action',
+			minWidth: '150px',
+			cell: (row) => <ActionButtons id={row.title} />,
+		},
+	];
+
 	return (
 		<DataTable
 			className='datatable'
@@ -29,67 +109,6 @@ const SurveyTable = () => {
 		/>
 	);
 };
-
-const columns = [
-	{
-		name: 'Audit ID',
-		selector: (row) => '4655',
-		sortable: true,
-		minWidth: '0px',
-	},
-	{
-		name: 'Client',
-		selector: (row) => 'GSmith Ltd',
-		sortable: true,
-		minWidth: '110px',
-	},
-	{
-		name: 'Brand',
-		selector: (row) => 'GSmith Hostel NG',
-		sortable: true,
-		minWidth: true,
-		minWidth: '110px',
-	},
-	{
-		name: 'Campaign',
-		selector: (row) => '1st round 2023',
-		sortable: true,
-		minWidth: '120px',
-		hide: 'md',
-	},
-	{
-		name: 'Start Date',
-		selector: (row) => row.date,
-		sortable: true,
-		minWidth: '110px',
-	},
-	{
-		name: 'End Date',
-		selector: (row) => row.date,
-		sortable: true,
-		minWidth: '110px',
-	},
-	{
-		name: 'Executive Summary',
-		minWidth: '120px',
-		cell: () => {
-			return <Badge color='success'>Completed</Badge>;
-		},
-	},
-	{
-		name: 'Action',
-		minWidth: '150px',
-		cell: () => {
-			const style = 'text-white text-[12px] rounded-sm p-1 px-2';
-			return (
-				<div className='flex'>
-					<div className={`${style} bg-[#252525] mr-1.5`}>Edit</div>
-					<div className={`${style} bg-red-700 text-white`}>Delete</div>
-				</div>
-			);
-		},
-	},
-];
 
 const data = [
 	{
