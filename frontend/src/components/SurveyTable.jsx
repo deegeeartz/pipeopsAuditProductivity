@@ -1,3 +1,4 @@
+
 import { Badge } from 'flowbite-react';
 import Link from 'next/link';
 import DataTable from 'react-data-table-component';
@@ -23,10 +24,10 @@ const SurveyTable = ({ setOpenDelModal }) => {
 			'text-[17px] cursor-pointer rounded-sm p-1 text-[#252525] border border-gray-300 hover:bg-gray-200';
 		return (
 			<div className='flex gap-x-2.5'>
-				<Link href={'4655'} className={`${style}`}>
+				<Link href={'surveys/4655/edit'} className={`${style}`}>
 					<RiEyeFill />
 				</Link>
-				<Link href={'4655'} className={`${style}`}>
+				<Link href={'surveys/4655/edit'} className={`${style}`}>
 					<RiEdit2Fill />
 				</Link>
 				<div className={`${style}`} onClick={() => setOpenDelModal(true)}>
@@ -76,10 +77,16 @@ const SurveyTable = ({ setOpenDelModal }) => {
 			minWidth: '110px',
 		},
 		{
-			name: 'Executive Summary',
+			name: 'Status',
 			minWidth: '120px',
 			cell: () => {
-				return <Badge color='success'>Completed</Badge>;
+				const count = 3;
+				return (
+					<Badge color={count > 0 ? 'success' : 'failure'}>
+						{count}
+						{count > 1 ? ' Entries' : ' Entry'}
+					</Badge>
+				);
 			},
 		},
 		{
