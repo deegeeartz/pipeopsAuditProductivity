@@ -1,4 +1,5 @@
 import Layout from '@/components/Layout';
+import Link from 'next/link';
 
 const AdminDashboard = () => {
 	return (
@@ -16,9 +17,9 @@ const AdminDashboard = () => {
 								<div className='text-sm font-medium text-gray-400'>Surveys</div>
 							</div>
 						</div>
-						<a href='/gebruikers' className='text-[#202639] font-medium text-sm hover:text-blue-900'>
+						<Link href='/admin/surveys' className='text-[#202639] font-medium text-sm hover:text-blue-900'>
 							View
-						</a>
+						</Link>
 					</div>
 
 					<div className='bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5'>
@@ -30,9 +31,9 @@ const AdminDashboard = () => {
 								<div className='text-sm font-medium text-gray-400'>Clients</div>
 							</div>
 						</div>
-						<a href='/dierenartsen' className='text-[#202639] font-medium text-sm hover:text-blue-900'>
+						<Link href='/admin/clients' className='text-[#202639] font-medium text-sm hover:text-blue-900'>
 							View
-						</a>
+						</Link>
 					</div>
 
 					<div className='bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5'>
@@ -42,9 +43,9 @@ const AdminDashboard = () => {
 								<div className='text-sm font-medium text-gray-400'>Inspectors</div>
 							</div>
 						</div>
-						<a href className='text-[#202639] font-medium text-sm hover:text-blue-900'>
+						<Link href='/admin/inspectors' className='text-[#202639] font-medium text-sm hover:text-blue-900'>
 							View
-						</a>
+						</Link>
 					</div>
 				</div>
 			</div>
