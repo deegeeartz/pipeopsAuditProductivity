@@ -3,7 +3,7 @@ import Link from 'next/link';
 import DataTable from 'react-data-table-component';
 import { RiDeleteBin4Fill, RiEdit2Fill, RiEyeFill } from 'react-icons/ri';
 
-const SurveyTable = ({ setOpenDelModal }) => {
+const SurveyTable = ({ setOpenDelModal, setEntryModal }) => {
 	const customStyles = {
 		rows: {
 			style: {
@@ -23,7 +23,7 @@ const SurveyTable = ({ setOpenDelModal }) => {
 			'text-[17px] cursor-pointer rounded-sm p-1 text-[#252525] border border-gray-300 hover:bg-gray-200';
 		return (
 			<div className='flex gap-x-2.5'>
-				<Link href={'surveys/4655/edit'} className={`${style}`}>
+				<Link href={'#'} className={`${style}`}>
 					<RiEyeFill />
 				</Link>
 				<Link href={'surveys/4655/edit'} className={`${style}`}>
@@ -81,7 +81,10 @@ const SurveyTable = ({ setOpenDelModal }) => {
 			cell: () => {
 				const count = 3;
 				return (
-					<Badge color={count > 0 ? 'success' : 'failure'}>
+					<Badge
+						color={count > 0 ? 'success' : 'failure'}
+						onClick={() => setEntryModal(true)}
+						className='cursor-pointer'>
 						{count}
 						{count > 1 ? ' Entries' : ' Entry'}
 					</Badge>

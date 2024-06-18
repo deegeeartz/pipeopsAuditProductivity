@@ -39,7 +39,7 @@ export function CategoryModal({ openModal, setOpenModal }) {
 						</div>
 
 						<div className='w-full'>
-							<button className='btn_primary px-8 w-36'>{isEdit ? 'Update' : 'Create'}</button>
+							<button className='btn_primary px-8 w-36'>{isEdit ? 'Update' : 'Submit'}</button>
 						</div>
 					</div>
 				</Modal.Body>

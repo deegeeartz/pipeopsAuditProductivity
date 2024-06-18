@@ -30,7 +30,7 @@ const Inspectors = () => {
 	const columns = [
 		{
 			name: 'ID',
-			selector: (row) => '4655',
+			selector: (row) => '#0625',
 			sortable: true,
 			minWidth: '0px',
 		},

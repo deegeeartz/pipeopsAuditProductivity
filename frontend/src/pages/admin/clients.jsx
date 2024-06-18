@@ -31,7 +31,7 @@ const Clients = () => {
 	const columns = [
 		{
 			name: 'ID',
-			selector: (row) => '4655',
+			selector: (row) => '#0528',
 			sortable: true,
 			minWidth: '0px',
 		},
@@ -52,11 +52,12 @@ const Clients = () => {
 			sortable: true,
 			minWidth: '120px',
 			cell: (row) => {
-				let passcode = row.title;
+				let passcode = row.title_ ?? 'Mike55115b';
 				return (
 					<div
 						onClick={() => {
-							console.log(row.title);
+							// console.log(row.title);
+							alert('Passcode: ' + passcode);
 						}}>
 						{<p>********</p>}
 					</div>

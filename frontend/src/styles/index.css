@@ -46,6 +46,7 @@ img {
 /* PAGES */
 
 .btn_primary {
+	text-align: center;
 	font-size: 14px;
 	padding: 7px 24px;
 	border-radius: 6px;

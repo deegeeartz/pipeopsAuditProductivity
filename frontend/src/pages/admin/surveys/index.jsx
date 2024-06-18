@@ -5,11 +5,13 @@ import { Loader } from '@/components/Loader';
 import dynamic from 'next/dynamic';
 import { RiAddFill } from 'react-icons/ri';
 import Link from 'next/link';
+import { Modal } from 'flowbite-react';
 
 const SurveyTable = dynamic(() => import('@/components/SurveyTable'), { ssr: false, loading: Loader });
 
 const Surveys = () => {
 	const [openDelModal, setOpenDelModal] = useState(false);
+	const [entryModal, setEntryModal] = useState(false);
 
 	return (
 		<Layout>
@@ -33,12 +35,74 @@ const Surveys = () => {
 						/>
 					</div>
 
-					<SurveyTable setOpenDelModal={setOpenDelModal} />
+					<SurveyTable setOpenDelModal={setOpenDelModal} setEntryModal={setEntryModal} />
 				</div>
 			</div>
 
 			{openDelModal && <DeleteModal openModal={openDelModal} setOpenModal={setOpenDelModal} />}
+			{entryModal && <EntriesModal openModal={entryModal} setOpenModal={setEntryModal} />}
 		</Layout>
+	);
+};
+
+const EntriesModal = ({ openModal, setOpenModal, data }) => {
+	return (
+		<>
+			<Modal dismissible position={'center'} show={openModal} onClose={() => setOpenModal(false)}>
+				<Modal.Header>List Of Entries</Modal.Header>
+
+				<Modal.Body>
+					<div className='space-y-6'>
+						<div>
+							<div className='card mb-4 grid gap-3 md:flex justify-between items-center p-3 bg-gray-50 border border-gray-200 rounded-lg '>
+								<span className='pr-2'>
+									<b>#1</b>
+								</span>
+								<span className='pr-2'>
+									<b>Inspector:</b> Mr. David
+								</span>
+								<span className='pr-2'>
+									<b>Date:</b> April 18, 2024
+								</span>
+								<Link href={'#'} className='btn_primary px-4'>
+									View
+								</Link>
+							</div>
+
+							<div className='card mb-4 grid gap-3 md:flex justify-between items-center p-3 bg-gray-50 border border-gray-200 rounded-lg '>
+								<span className='pr-2'>
+									<b>#2</b>
+								</span>
+								<span className='pr-2'>
+									<b>Inspector:</b> Mr. David
+								</span>
+								<span className='pr-2'>
+									<b>Date:</b> April 18, 2024
+								</span>
+								<Link href={'#'} className='btn_primary px-4'>
+									View
+								</Link>
+							</div>
+
+							<div className='card mb-4 grid gap-3 md:flex justify-between items-center p-3 bg-gray-50 border border-gray-200 rounded-lg '>
+								<span className='pr-2'>
+									<b>#3</b>
+								</span>
+								<span className='pr-2'>
+									<b>Inspector:</b> Mr. David
+								</span>
+								<span className='pr-2'>
+									<b>Date:</b> April 18, 2024
+								</span>
+								<Link href={'#'} className='btn_primary px-4'>
+									View
+								</Link>
+							</div>
+						</div>
+					</div>
+				</Modal.Body>
+			</Modal>
+		</>
 	);
 };
 

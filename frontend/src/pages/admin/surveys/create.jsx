@@ -17,44 +17,25 @@ const categoryDemo = [
 ];
 
 const questionsDemo = [
-	{
-		id: '82Q_1713821351111',
-		type: 'text',
-		title: 'How was your experience at the hotel?',
-		categoryId: '1',
-		options: {},
-	},
-	{
-		id: '64Q_1713821353243',
-		type: 'multi_choice',
-		title: 'How was your experience at the hotel?',
-		categoryId: '1',
-		options: {
-			1: 'Very Satisfied',
-			2: 'Satisfied',
-			3: 'Bad',
-			4: 'Very Bad',
-		},
-	},
-	{
-		id: '8Q_1713821355477',
-		type: 'text',
-		title: 'How was your experience at the hotel?',
-		categoryId: '2',
-		options: {},
-	},
-	{
-		id: '53Q_1713821356093',
-		type: 'multi_choice',
-		title: 'How was your experience at the hotel?',
-		categoryId: '3',
-		options: {
-			1: 'Very Good',
-			2: 'Good',
-			3: 'Bad',
-			4: 'Very Bad',
-		},
-	},
+	// {
+	// 	id: '82Q_1713821351111',
+	// 	type: 'text',
+	// 	title: 'How was your experience at the hotel?',
+	// 	categoryId: '1',
+	// 	options: {},
+	// },
+	// {
+	// 	id: '64Q_1713821353243',
+	// 	type: 'multi_choice',
+	// 	title: 'How was your experience at the hotel?',
+	// 	categoryId: '1',
+	// 	options: {
+	// 		1: 'Very Satisfied',
+	// 		2: 'Satisfied',
+	// 		3: 'Bad',
+	// 		4: 'Very Bad',
+	// 	},
+	// },
 ];
 
 const CreateSurvey = () => {
@@ -69,7 +50,7 @@ const CreateSurvey = () => {
 		setQuestions(questions.filter((item) => item.id !== id));
 	};
 
-	const CreateSurvey = (el) => {
+	const onFormSubmit = (el) => {
 		el.preventDefault();
 
 		console.log('questions', questions);
@@ -88,7 +69,7 @@ const CreateSurvey = () => {
 				</div>
 
 				<div className='py-7 px-5 mb-8 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
-					<form className='w-full' onSubmit={CreateSurvey}>
+					<form className='w-full' onSubmit={onFormSubmit}>
 						<div className={`step1 details ${step !== 1 && 'hidden'}`}>
 							<h3 className='heading text-xl font-semibold mb-8 uppercase'>Survey Details</h3>
 
@@ -294,11 +275,13 @@ const AddQuestion = ({ category, setQuestions }) => {
 			<div className='mb-5 w-full md:flex'>
 				<SelectField
 					label='Category'
-					value={data?.category ?? ''}
+					value={data?.categoryId ?? ''}
 					onChange={(el) => setData({ ...data, categoryId: el.target.value })}>
 					<option value=''>select category</option>
-					{category.map((item) => (
-						<option value={item.id}>{item.text}</option>
+					{category.map((item, index) => (
+						<option key={index} value={item.id}>
+							{item.text}
+						</option>
 					))}
 				</SelectField>
 

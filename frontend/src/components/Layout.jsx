@@ -12,6 +12,7 @@ import {
 	RiUserStarLine,
 } from 'react-icons/ri';
 import { FaUserCircle } from 'react-icons/fa';
+import { Dropdown } from 'flowbite-react';
 
 const Layout = ({ children }) => {
 	const router = useRouter();
@@ -137,10 +138,23 @@ const Layout = ({ children }) => {
 							</svg>
 						</button>
 
-						<li className='dropdown ml-6'>
-							<button type='button' className='dropdown-toggle flex items-center'>
-								<FaUserCircle size={24} color='#252525' />
-							</button>
+						<li className='dropdown ml-5'>
+							<Dropdown
+								dismissOnClick={false}
+								renderTrigger={() => (
+									<button type='button' className='dropdown-toggle flex items-center'>
+										<FaUserCircle size={24} color='#252525' />
+									</button>
+								)}>
+								<Dropdown.Item>
+									<Link href={'/admin/settings'} className='px-4 font-medium'>
+										Settings
+									</Link>
+								</Dropdown.Item>
+								<Dropdown.Item>
+									<div className='cursor-pointer px-4 font-medium text-red-700'>Sign out</div>
+								</Dropdown.Item>
+							</Dropdown>
 						</li>
 					</ul>
 				</div>
