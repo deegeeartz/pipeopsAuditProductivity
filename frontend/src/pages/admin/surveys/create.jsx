@@ -1,15 +1,78 @@
 import { useState } from 'react';
 import Layout from '@/components/Layout';
-import { RiAddFill, RiArrowLeftLine, RiCloseLine, RiDeleteBin4Fill } from 'react-icons/ri';
+import { RiAddFill, RiArrowLeftLine, RiCheckboxBlankCircleLine, RiCloseLine } from 'react-icons/ri';
 
 import Link from 'next/link';
 import { Accordion } from 'flowbite-react';
 import { FloatField, InputFieldStatic, SelectField } from '@/components/Fields';
 import { CategoryPanel, QuestionBox } from '@/components/QuestionUI';
+import { toast } from 'react-toastify';
+
+const categoryData = [
+	{ id: 1, text: 'Arrival and check in - General' },
+	{ id: 2, text: 'Arrival and check in - Reception' },
+	{ id: 3, text: 'Check out and departure - General' },
+	{ id: 4, text: 'Check out and departure - Reception' },
+];
+
+const questionsDemo = [
+	{
+		id: '82Q_1713821351111',
+		type: 'text',
+		title: 'How was your experience at the hotel?',
+		categoryId: '1',
+		options: {},
+	},
+	{
+		id: '64Q_1713821353243',
+		type: 'multi_choice',
+		title: 'How was your experience at the hotel?',
+		categoryId: '1',
+		options: {
+			1: 'Very Satisfied',
+			2: 'Satisfied',
+			3: 'Bad',
+			4: 'Very Bad',
+		},
+	},
+	{
+		id: '8Q_1713821355477',
+		type: 'text',
+		title: 'How was your experience at the hotel?',
+		categoryId: '2',
+		options: {},
+	},
+	{
+		id: '53Q_1713821356093',
+		type: 'multi_choice',
+		title: 'How was your experience at the hotel?',
+		categoryId: '3',
+		options: {
+			1: 'Very Good',
+			2: 'Good',
+			3: 'Bad',
+			4: 'Very Bad',
+		},
+	},
+];
 
 const CreateSurvey = () => {
 	// const [openDelModal, setOpenDelModal] = useState(false);
 	const [step, setStep] = useState(1);
+	const [category, setCategory] = useState(categoryData);
+	const [formData, setFormData] = useState({});
+	const [questions, setQuestions] = useState(questionsDemo);
+
+	const removeQuestion = (id) => {
+		setQuestions(questions.filter((item) => item.id !== id));
+	};
+
+	const CreateSurvey = (el) => {
+		el.preventDefault();
+
+		console.log('questions', questions);
+		console.log('formData', formData);
+	};
 
 	return (
 		<Layout>
@@ -18,12 +81,12 @@ const CreateSurvey = () => {
 					<h1 className='font-bold text-lg text-[#222]'>Create Survey</h1>
 					<Link href='/admin/surveys' className='btn_primary _flex'>
 						<RiArrowLeftLine className='mr-2 h-5 w-5' />
-						<span className='hidden md:block'>View All</span>
+						<span className='hidden md:block'>All Surveys</span>
 					</Link>
 				</div>
 
 				<div className='py-7 px-5 mb-8 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
-					<form className='w-full'>
+					<form className='w-full' onSubmit={CreateSurvey}>
 						<div className={`step1 details ${step !== 1 && 'hidden'}`}>
 							<h3 className='heading text-xl font-semibold mb-8 uppercase'>Survey Details</h3>
 
@@ -65,34 +128,43 @@ const CreateSurvey = () => {
 								<div className='btn_outline'>New category</div>
 							</div>
 
-							<AddQuestion />
+							<AddQuestion category={category} setQuestions={setQuestions} />
 
 							<div className='mt-8 mb-6 border border-gray-300' />
-							<p className='heading text-base font-medium mb-7'>Questions</p>
+							<p className='heading text-base font-medium mb-7'>Questions ({questions.length})</p>
 
-							<div className='mb-5'>
-								<Accordion>
-									<Accordion.Panel className='box'>
-										<CategoryPanel title={'Check out and departure - General'} count={2}>
-											<QuestionBox id={2} type={'Input'} title='How was your experience at the hotel?' />
-											<QuestionBox id={2} type={'Option'} title='How was your experience at the hotel?' />
-										</CategoryPanel>
-									</Accordion.Panel>
+							{!questions.length ? (
+								<p className='text-red-500 mb-4'>No questions added!</p>
+							) : (
+								<div className='mb-5'>
+									<Accordion>
+										{category.map((item) => {
+											const categoryQuestions = questions.filter(
+												(question) => question.categoryId === item.id.toString()
+											);
 
-									<Accordion.Panel className='box'>
-										<CategoryPanel title={'Arrival and check in - Reception'} count={1}>
-											<QuestionBox id={2} type={'Option'} title='How was your experience at the hotel?' />
-										</CategoryPanel>
-									</Accordion.Panel>
+											if (categoryQuestions.length === 0) {
+												return <></>;
+											}
 
-									<Accordion.Panel className='box'>
-										<CategoryPanel title={'Check out and departure - General'} count={1}>
-											<QuestionBox id={2} type={'Input'} title='How was your experience at the hotel?' />
-											<QuestionBox id={2} type={'Option'} title='How was your experience at the hotel?' />
-										</CategoryPanel>
-									</Accordion.Panel>
-								</Accordion>
-							</div>
+											return (
+												<Accordion.Panel key={item.id} className='box'>
+													<CategoryPanel title={item.text} count={categoryQuestions.length}>
+														{categoryQuestions.map((question, index) => (
+															<QuestionBox
+																key={index}
+																id={index + 1}
+																question={question}
+																removeQuestion={removeQuestion}
+															/>
+														))}
+													</CategoryPanel>
+												</Accordion.Panel>
+											);
+										})}
+									</Accordion>
+								</div>
+							)}
 						</div>
 
 						<div className='py-5 _flex'>
@@ -117,41 +189,63 @@ const CreateSurvey = () => {
 	);
 };
 
-const AddQuestion = () => {
-	const [data, setData] = useState({ type: 'text' });
-	const [options, setOptions] = useState({ 1: '' });
-	const [optionFields, setOptionFields] = useState([1]);
+const AddQuestion = ({ category, setQuestions }) => {
+	const [data, setData] = useState({ id: '', type: 'text', title: '', categoryId: '' });
+	const [options, setOptions] = useState({});
+	const [optionFields, setOptionFields] = useState([1, 2]);
 
 	const addOptionField = () => {
-		const id = optionFields[optionFields.length - 1] + 1;
-		console.log(id, data, options);
+		const lastID = optionFields[optionFields.length - 1] ?? 0;
+		const id = lastID + 1;
 		setOptionFields([...optionFields, id]);
+		// console.log(id, data, options);
 	};
 
 	const onChangeInput = (el, id) => {
 		setOptions({ ...options, [id]: el.target.value });
-		console.log(el.target);
-		el.target.focus();
+		// console.log(el.target);
 	};
 
 	const removeOptionField = (id) => {
-		console.log(optionFields, options);
-		setOptions({ ...options, [id]: '' });
 		setOptionFields(optionFields.filter((idx) => idx !== id));
+		const newOptions = { ...options, [id]: '' };
+		setOptions(newOptions);
 	};
-
-	const OptionField = ({ label, value, id, ...props }) => (
-		<div className='w-full mb-2 _flex'>
-			<span className='border-2 border-gray-400 rounded-full w-[21px] h-[21px] mt-2 mr-3'></span>
-			<InputFieldStatic label={label} style='' value={value} {...props} />
-			<RiCloseLine size={26} className='mx-4' onClick={() => removeOptionField(id)} />
-		</div>
-	);
 
 	const submitForm = (el) => {
 		el.preventDefault();
-		const questionData = { ...data, options };
+		// Get valid options
+		const filteredOptions = Object.fromEntries(
+			Object.entries(options).filter(([key, value]) => value.trim() !== '')
+		);
+
+		// Validation
+		if (!data.categoryId) {
+			toast.error('Category is required!', {});
+			return;
+		}
+		if (!data.type) {
+			toast.error('Field Type is required!', {});
+			return;
+		}
+		if (!data.title) {
+			toast.error('Question field is required!', {});
+			return;
+		}
+		if (data.type == 'multi_choice' && Object.keys(filteredOptions).length === 0) {
+			toast.error('Option field is required!', {});
+			return;
+		}
+
+		// Generate ID
+		const id = Math.floor(Math.random() * 99) + 'Q_' + Date.now();
+		const questionData = { ...data, id, options: filteredOptions };
+		setQuestions((prev) => [...prev, questionData]);
+		// Reset Data
+		setData({ type: 'text' });
 		console.log(questionData);
+
+		toast.success('Question added successfully!', {});
 	};
 
 	return (
@@ -159,31 +253,31 @@ const AddQuestion = () => {
 			<div className='mb-5 w-full md:flex'>
 				<SelectField
 					label='Category'
-					value={data.category}
-					onChange={(el) => setData({ ...data, category: el.target.value })}>
-					<option>select category</option>
-					<option>Check out and departure - General</option>
-					<option>Check out and departure - Reception</option>
-					<option>Health Check and customer service</option>
+					value={data?.category ?? ''}
+					onChange={(el) => setData({ ...data, categoryId: el.target.value })}>
+					<option value=''>select category</option>
+					{category.map((item) => (
+						<option value={item.id}>{item.text}</option>
+					))}
 				</SelectField>
 
 				<SelectField
 					label='Type'
 					style='md:w-1/3 md:ml-4 mt-4 md:m-0'
-					value={data.type}
+					value={data.type ?? ''}
 					onChange={(el) => setData({ ...data, type: el.target.value })}>
-					<option>select field type</option>
+					<option value=''>select field type</option>
 					<option value='text'>Text</option>
 					<option value='multi_choice'>Multi Choice</option>
 				</SelectField>
 			</div>
 
-			<div className='mb-3 md:flex items-center'>
+			<div className='mb-6 md:mb-3 md:flex items-center'>
 				<div className='w-full mb-4 md:mb-0'>
 					<FloatField
 						label={'Enter Question'}
-						value={data.question}
-						onChange={(el) => setData({ ...data, question: el.target.value })}
+						value={data.title ?? ''}
+						onChange={(el) => setData({ ...data, title: el.target.value })}
 					/>
 				</div>
 
@@ -196,21 +290,17 @@ const AddQuestion = () => {
 			{data.type == 'multi_choice' && (
 				<div className='multi_choice pb-2'>
 					{optionFields.map((id, index) => (
-						<div key={index}>
-							<OptionField
-								label={'Option ' + id}
-								id={id}
-								key={id}
-								value={options[id]}
-								onChange={(el) => onChangeInput(el, id)}
-							/>
-						</div>
+						<OptionField
+							label={'Option ' + id}
+							key={id}
+							value={options[id]}
+							onChange={(el) => onChangeInput(el, id)}
+							removeOptionField={() => removeOptionField(id)}
+						/>
 					))}
 
-					{/* <OptionField label={'Add Option'} onClickFunc={addOptionField} /> */}
-
 					<div className='w-full mb-2 _flex'>
-						<span className='border-2 border-gray-400 rounded-full w-[21px] h-[21px] mt-2 mr-3'></span>
+						<RiCheckboxBlankCircleLine size={24} className='text-gray-400 mt-1 mr-3' />
 						<InputFieldStatic
 							label={'Add option'}
 							style='focus:!border-gray-200 placeholder:text-[#252525]'
@@ -224,5 +314,13 @@ const AddQuestion = () => {
 		</>
 	);
 };
+
+const OptionField = ({ label, value, removeOptionField, ...props }) => (
+	<div className='w-full mb-2 _flex'>
+		<RiCheckboxBlankCircleLine size={24} className='text-gray-400 mt-1 mr-3' />
+		<InputFieldStatic label={label} style='' value={value} {...props} />
+		<RiCloseLine size={26} className='mx-4 cursor-pointer' onClick={removeOptionField} />
+	</div>
+);
 
 export default CreateSurvey;
