@@ -52,6 +52,7 @@ img {
 	border-radius: 6px;
 	color: #fff;
 	background: #252525;
+	justify-content: center;
 	@apply select-none transition-all hover:opacity-85;
 }
 
@@ -101,7 +102,7 @@ img {
 
 /*!----- MEDIA QUERIES -------*/
 @media (min-width: 1280px) {
-	.container {
+	/* .container {
 		max-width: 1280px;
-	}
+	} */
 }

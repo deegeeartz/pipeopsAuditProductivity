@@ -15,10 +15,10 @@ export const SelectField = ({ label, style, children, ...props }) => (
 	</div>
 );
 
-export const FloatField = ({ label, style, ...props }) => (
+export const FloatField = ({ label, className, ...props }) => (
 	<FloatingLabel
 		variant='outlined'
-		className={'focus:!border-[#252525] peer-focus:!text-[#252525] ' + style}
+		className={'focus:!border-[#252525] peer-focus:!text-[#252525] ' + (className ?? '')}
 		width={100}
 		label={label}
 		{...props}
