@@ -1,15 +1,14 @@
-import { useEffect, useState } from 'react';
 import Layout from '@/components/Layout';
-import DeleteModal from '@/components/DeleteModal';
 import { Loader } from '@/components/Loader';
 import { Button, Label, Modal, TextInput } from 'flowbite-react';
 import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 import { FaExclamationCircle } from 'react-icons/fa';
 import { RiAddFill, RiDeleteBin4Fill, RiEdit2Fill } from 'react-icons/ri';
 
 const DataTableX = dynamic(() => import('@/components/DataTableX'), { ssr: false, loading: Loader });
 
-const Clients = () => {
+const Settings = () => {
 	const [openModal, setOpenModal] = useState({ open: false, type: 'create' });
 	const [openDelModal, setOpenDelModal] = useState(false);
 
@@ -31,47 +30,21 @@ const Clients = () => {
 	const columns = [
 		{
 			name: 'ID',
-			selector: (row) => '4655',
+			selector: (row) => '#' + Math.floor(Math.random() * 9999) + 'C',
 			sortable: true,
-			minWidth: '0px',
+			minWidth: '20px',
+			maxWidth: '160px',
 		},
 		{
-			name: 'Name',
-			selector: (row) => 'GSmith Ltd',
+			name: 'Title',
+			selector: (row) => 'Arrival and check in - General',
 			sortable: true,
-			minWidth: '110px',
+			minWidth: '50%',
 		},
-		{
-			name: 'Email',
-			selector: (row) => 'dytech.studio@gmail.com',
-			sortable: true,
-			minWidth: '210px',
-		},
-		{
-			name: 'Passcode',
-			sortable: true,
-			minWidth: '120px',
-			cell: (row) => {
-				let passcode = row.title;
-				return (
-					<div
-						onClick={() => {
-							console.log(row.title);
-						}}>
-						{<p>********</p>}
-					</div>
-				);
-			},
-		},
-		{
-			name: 'Date Added',
-			selector: (row) => row.date,
-			sortable: true,
-			minWidth: '110px',
-		},
+
 		{
 			name: 'Action',
-			minWidth: '150px',
+			maxWidth: '160px',
 			cell: (row) => <ActionButtons id={row.title} />,
 		},
 	];
@@ -80,17 +53,16 @@ const Clients = () => {
 		<Layout>
 			<div className='content p-6'>
 				<div className='mb-7 flex justify-between items-center'>
-					<h1 className='font-bold text-lg text-[#222]'>Manage Clients</h1>
-
+					<h1 className='font-bold text-lg text-[#222]'>Settings</h1>
 					<button onClick={() => setOpenModal({ open: true, type: 'create' })} className='btn_primary _flex'>
 						<RiAddFill className='mr-2 h-5 w-5' />
-						Create New
+						Add Category
 					</button>
 				</div>
 
 				<div className='py-1 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
 					<div className='py-3 px-4 flex justify-between items-center'>
-						<p className='text-[13px] font-semibold'>Total (4)</p>
+						<p className='text-[13px] font-semibold'>Category (4)</p>
 						<div></div>
 						<input
 							type='text'
@@ -103,24 +75,20 @@ const Clients = () => {
 				</div>
 			</div>
 
-			{openModal.open && <CustomModal openModal={openModal} setOpenModal={setOpenModal} />}
+			{openModal.open && <CategoryModal openModal={openModal} setOpenModal={setOpenModal} />}
 			{openDelModal && <DeleteModal openModal={openDelModal} setOpenModal={setOpenDelModal} />}
 		</Layout>
 	);
 };
 
-function CustomModal({ openModal, setOpenModal }) {
-	const [name, setName] = useState('');
-	const [email, setEmail] = useState('');
-	const [passcode, setPasscode] = useState('');
+function CategoryModal({ openModal, setOpenModal }) {
+	const [category, setCategory] = useState('');
 
 	const isEdit = openModal.type === 'edit';
 
 	useEffect(() => {
 		const setField = () => {
-			setName('Test User');
-			setEmail('dycodes51@gmail.com');
-			setPasscode('hello25653');
+			setCategory('Arrival and check in - General');
 		};
 
 		isEdit && setField();
@@ -129,40 +97,20 @@ function CustomModal({ openModal, setOpenModal }) {
 	return (
 		<>
 			<Modal dismissible show={openModal.open} onClose={() => setOpenModal({ ...openModal, open: false })}>
-				<Modal.Header>{isEdit ? 'Edit Client' : 'Create New Client'}</Modal.Header>
+				<Modal.Header>{isEdit ? 'Edit Category' : 'Add New Category'}</Modal.Header>
 
 				<Modal.Body>
 					<div className='space-y-6'>
 						<div>
 							<div className='mb-2 block'>
-								<Label htmlFor='name' value='Name' />
-							</div>
-							<TextInput id='name' value={name} onChange={(e) => setName(e.target.value)} required />
-						</div>
-
-						<div>
-							<div className='mb-2 block'>
-								<Label htmlFor='email' value='Email Address' />
+								<Label htmlFor='category' value='Category' />
 							</div>
 							<TextInput
-								id='email'
-								placeholder='name@company.com'
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
+								id='category'
+								value={category}
+								onChange={(e) => setCategory(e.target.value)}
 								required
-							/>
-						</div>
-
-						<div>
-							<div className='mb-2 block'>
-								<Label htmlFor='passcode' value='Passcode' />
-							</div>
-							<TextInput
-								id='passcode'
-								type={isEdit ? 'text' : 'password'}
-								value={passcode}
-								onChange={(e) => setPasscode(e.target.value)}
-								required
+								// placeholder='Enter category'
 							/>
 						</div>
 
@@ -176,4 +124,31 @@ function CustomModal({ openModal, setOpenModal }) {
 	);
 }
 
-export default Clients;
+function DeleteModal({ openModal, setOpenModal, deleteFunc }) {
+	return (
+		<>
+			<Modal dismissible show={openModal} size='md' onClose={() => setOpenModal(false)} popup>
+				<Modal.Header />
+
+				<Modal.Body>
+					<div className='text-center'>
+						<FaExclamationCircle className='mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200' />
+						<h3 className='mb-5 text-lg font-normal text-gray-500 dark:text-gray-400'>
+							Are you sure you want to delete this item?
+						</h3>
+						<div className='flex justify-center gap-4'>
+							<Button color='failure' onClick={() => setOpenModal(false)}>
+								{"Yes, I'm sure"}
+							</Button>
+							<Button color='gray' onClick={() => setOpenModal(false)}>
+								No, cancel
+							</Button>
+						</div>
+					</div>
+				</Modal.Body>
+			</Modal>
+		</>
+	);
+}
+
+export default Settings;

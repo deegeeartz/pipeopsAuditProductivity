@@ -4,9 +4,9 @@ export default function Home() {
 			<div className='h-screen flex flex-col md:flex-row'>
 				<div
 					className='flex h-1/2 md:w-1/2 md:h-full justify-around items-center'
-					style={{ background: 'linear-gradient(112.1deg, rgb(14, 50, 108) 11.4%, #20242f 70.2%)' }}>
+					style={{ background: 'linear-gradient(112.1deg, rgb(32, 38, 57) 11.4%, #20242f 70.2%)' }}>
 					<div className='container mx-auto p-6 md:w-3/4 text-center'>
-						<img src='/logo-xl.png' alt='' className='w-[150px] md:w-[170px] mb-5 mx-auto' />
+						<img src='/logo-xl.png' alt='' className='w-[140px] md:w-[160px] mb-5 mx-auto' />
 						{/* <h1 className='text-white font-bold text-4xl font-sans mb-4'>Bespoke audits</h1> */}
 					</div>
 				</div>
@@ -44,9 +44,10 @@ export default function Home() {
 						<button
 							type='submit'
 							className='block w-full py-2 rounded-md text-white font-semibold mb-2'
-							style={{ background: '#142d58' }}>
+							style={{ background: '#20242f' }}>
 							Login
 						</button>
+						{/* <span className='text-sm ml-2 hover:text-blue-500 cursor-pointer'>Forgot Password ?</span> */}
 					</form>
 				</div>
 			</div>

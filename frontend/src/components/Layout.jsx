@@ -7,6 +7,7 @@ import {
 	RiBook2Line,
 	RiHome4Line,
 	RiMenuLine,
+	RiSettings3Line,
 	RiUserSearchLine,
 	RiUserStarLine,
 } from 'react-icons/ri';
@@ -85,6 +86,16 @@ const Layout = ({ children }) => {
 							className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
 							<RiUserSearchLine className='mr-3 text-lg' />
 							<span className='text-sm'>Manage Inspectors</span>
+							<i className='ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90' />
+						</Link>
+					</li>
+
+					<li className={`mb-1 group ${pathname === '/admin/settings' ? 'active' : ''}`}>
+						<Link
+							href='/admin/settings'
+							className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
+							<RiSettings3Line className='mr-3 text-lg' />
+							<span className='text-sm'>Settings</span>
 							<i className='ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90' />
 						</Link>
 					</li>

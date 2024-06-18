@@ -7,8 +7,9 @@ import { Accordion } from 'flowbite-react';
 import { FloatField, InputFieldStatic, SelectField } from '@/components/Fields';
 import { CategoryPanel, QuestionBox } from '@/components/QuestionUI';
 import { toast } from 'react-toastify';
+import { CategoryModal } from '@/components/CategoryModal';
 
-const categoryData = [
+const categoryDemo = [
 	{ id: 1, text: 'Arrival and check in - General' },
 	{ id: 2, text: 'Arrival and check in - Reception' },
 	{ id: 3, text: 'Check out and departure - General' },
@@ -58,8 +59,9 @@ const questionsDemo = [
 
 const CreateSurvey = () => {
 	// const [openDelModal, setOpenDelModal] = useState(false);
+	const [openCatModal, setOpenCatModal] = useState({ open: false, type: 'create' });
 	const [step, setStep] = useState(1);
-	const [category, setCategory] = useState(categoryData);
+	const [category, setCategory] = useState(categoryDemo);
 	const [formData, setFormData] = useState({});
 	const [questions, setQuestions] = useState(questionsDemo);
 
@@ -100,24 +102,56 @@ const CreateSurvey = () => {
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Brand'} value={''} />
+								<FloatField
+									label={'Brand'}
+									value={formData.brand ?? ''}
+									onChange={(el) => setFormData({ ...formData, brand: el.target.value })}
+								/>
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Campaign'} value={''} />
+								<FloatField
+									label={'Campaign'}
+									value={formData.campaign ?? ''}
+									onChange={(el) => setFormData({ ...formData, campaign: el.target.value })}
+								/>
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Location'} value={''} />
+								<FloatField
+									label={'Location'}
+									value={formData.location ?? ''}
+									onChange={(el) => setFormData({ ...formData, location: el.target.value })}
+								/>
 							</div>
 
 							<div className='mb-5'>
+								<FloatField
+									label={'Start Date'}
+									value={formData.start_date ?? ''}
+									onChange={(el) => setFormData({ ...formData, start_date: el.target.value })}
+									type='date'
+									onFocus={(el) => el.target.showPicker()}
+								/>
+							</div>
+
+							<div className='mb-5'>
+								<FloatField
+									label={'End Date'}
+									value={formData.end_date ?? ''}
+									onChange={(el) => setFormData({ ...formData, end_date: el.target.value })}
+									type='date'
+									onFocus={(el) => el.target.showPicker()}
+								/>
+							</div>
+
+							{/* <div className='mb-5'>
 								<SelectField label={'Assign Inspector'}>
 									<option>select inspector</option>
 									<option>Paul Smith</option>
 									<option>David Samuel</option>
 								</SelectField>
-							</div>
+							</div> */}
 						</div>
 
 						<div className={`step2 questionnaire ${step !== 2 && 'hidden'}`}>
@@ -125,7 +159,9 @@ const CreateSurvey = () => {
 
 							<div className='fx_between mb-7'>
 								<p className='heading text-base font-medium'>Add Questions</p>
-								<div className='btn_outline'>New category</div>
+								<div className='btn_outline' onClick={() => setOpenCatModal({ open: true, type: 'create' })}>
+									New category
+								</div>
 							</div>
 
 							<AddQuestion category={category} setQuestions={setQuestions} />
@@ -170,7 +206,10 @@ const CreateSurvey = () => {
 						<div className='py-5 _flex'>
 							<button
 								type='button'
-								onClick={() => (step == 1 ? setStep(2) : setStep(1))}
+								onClick={() => {
+									window.scrollTo({ top: 0, behavior: 'smooth' });
+									step == 1 ? setStep(2) : setStep(1);
+								}}
 								className='btn_primary !py-[10px] md:!px-[30px] mr-4'>
 								{step == 1 ? 'Next' : 'Previous'}
 							</button>
@@ -185,6 +224,8 @@ const CreateSurvey = () => {
 					</form>
 				</div>
 			</div>
+
+			{openCatModal.open && <CategoryModal openModal={openCatModal} setOpenModal={setOpenCatModal} />}
 		</Layout>
 	);
 };

@@ -88,7 +88,7 @@ const Inspectors = () => {
 
 				<div className='py-1 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
 					<div className='py-3 px-4 flex justify-between items-center'>
-						<p className='text-[13px] font-semibold'>Total (2)</p>
+						<p className='text-[13px] font-semibold'>Total (4)</p>
 						<div></div>
 						<input
 							type='text'
