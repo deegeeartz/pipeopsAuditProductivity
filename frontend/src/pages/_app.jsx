@@ -10,7 +10,7 @@ export default function App({ Component, pageProps }) {
 	return (
 		<div className={font.className}>
 			<Head>
-				<title>Bespoke Audits</title>
+				<title>Audit Pro</title>
 				<link rel='icon' href='/icon.png' type='image/PNG' />
 			</Head>
 
