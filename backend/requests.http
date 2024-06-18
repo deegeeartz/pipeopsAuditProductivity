@@ -1,0 +1,55 @@
+
+GET http://localhost:8080/api/
+
+###
+
+POST http://localhost:8080/api/login 
+content-type: application/json
+
+{
+	"email": "emma45@test.com",
+	"password": "#password2345"
+}
+
+###
+
+GET http://localhost:8080/api/clients
+
+###
+
+POST http://localhost:8080/api/clients 
+content-type: application/json
+
+{
+	"hotelName": "Hotel Dave",
+	"location": "London",
+	"additionalNotes": "This is a note",
+	"name": "Emmanuel",
+	"email": "emma45@test.com",
+	"password": "#password2345"
+}
+
+###
+
+GET http://localhost:8080/api/inspectors/
+
+###
+
+POST http://localhost:8080/api/inspectors 
+content-type: application/json
+
+{
+	"location": "London UK",
+	"language": "English",
+	"phoneNumber": "090446344354",
+	"name": "Emmanuel 2",
+	"email": "emma63@test.com",
+	"password": "#password2345"
+}
+
+###
+
+GET  http://localhost:8080/api/setup 
+
+###
+yy
