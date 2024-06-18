@@ -46,11 +46,13 @@ img {
 /* PAGES */
 
 .btn_primary {
+	text-align: center;
 	font-size: 14px;
 	padding: 7px 24px;
 	border-radius: 6px;
 	color: #fff;
 	background: #252525;
+	justify-content: center;
 	@apply select-none transition-all hover:opacity-85;
 }
 
@@ -100,7 +102,7 @@ img {
 
 /*!----- MEDIA QUERIES -------*/
 @media (min-width: 1280px) {
-	.container {
+	/* .container {
 		max-width: 1280px;
-	}
+	} */
 }

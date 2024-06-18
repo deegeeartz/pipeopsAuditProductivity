@@ -5,12 +5,15 @@ import React, { useState } from 'react';
 import {
 	RiArrowDropRightLine,
 	RiBook2Line,
+	RiHistoryLine,
 	RiHome4Line,
 	RiMenuLine,
+	RiSettings3Line,
 	RiUserSearchLine,
 	RiUserStarLine,
 } from 'react-icons/ri';
 import { FaUserCircle } from 'react-icons/fa';
+import { Dropdown } from 'flowbite-react';
 
 const Layout = ({ children }) => {
 	const router = useRouter();
@@ -32,7 +35,10 @@ const Layout = ({ children }) => {
 	}
 
 	const getHeaderText = () => {
-		const breadcrumb = pathname.split('/').filter(Boolean); // Filter out empty strings
+		let breadcrumb = pathname.split('/').filter(Boolean); // Filter out empty strings
+		if (breadcrumb[1] == '[id]') breadcrumb[1] = 'New';
+		if (pathname.includes('edit')) breadcrumb[1] = 'Edit';
+		// console.log(pathname, breadcrumb);
 		return breadcrumb;
 	};
 
@@ -43,6 +49,7 @@ const Layout = ({ children }) => {
 				<link rel='icon' href='/icon.png' type='image/PNG' />
 			</Head>
 
+			{/* SIDEBAR */}
 			<div
 				className={`fixed md:-translate-x-0 left-0 top-0 w-64 h-full bg-[#fff] p-4 z-50 transition-transform border-r border-gray-200 ${
 					sidebarOpen ? '-translate-x-0' : '-translate-x-full'
@@ -52,42 +59,76 @@ const Layout = ({ children }) => {
 				</Link>
 
 				<ul className='mt-4'>
-					<li className={`mb-1 group ${pathname === '/admin' ? 'active' : ''}`}>
-						<Link
-							href='/admin'
-							className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
-							<RiHome4Line className='mr-3 text-lg' />
-							<span className='text-sm'>Dashboard</span>
-						</Link>
-					</li>
+					{pathname.includes('/admin') ? (
+						<>
+							<li className={`mb-1 group ${pathname === '/admin' ? 'active' : ''}`}>
+								<Link
+									href='/admin'
+									className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
+									<RiHome4Line className='mr-3 text-lg' />
+									<span className='text-sm'>Dashboard</span>
+								</Link>
+							</li>
 
-					<li className={`mb-1 group ${pathname === '/admin/surveys' ? 'active' : ''}`}>
-						<Link
-							href='/admin/surveys'
-							className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
-							<RiBook2Line className='mr-3 text-lg' />
-							<span className='text-sm'>Manage Surveys</span>
-						</Link>
-					</li>
+							<li className={`mb-1 group ${pathname === '/admin/surveys' ? 'active' : ''}`}>
+								<Link
+									href='/admin/surveys'
+									className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
+									<RiBook2Line className='mr-3 text-lg' />
+									<span className='text-sm'>Manage Surveys</span>
+								</Link>
+							</li>
 
-					<li className={`mb-1 group ${pathname === '/admin/clients' ? 'active' : ''}`}>
-						<Link
-							href='/admin/clients'
-							className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
-							<RiUserStarLine className='mr-3 text-lg' />
-							<span className='text-sm'>Manage Clients</span>
-						</Link>
-					</li>
+							<li className={`mb-1 group ${pathname === '/admin/clients' ? 'active' : ''}`}>
+								<Link
+									href='/admin/clients'
+									className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
+									<RiUserStarLine className='mr-3 text-lg' />
+									<span className='text-sm'>Manage Clients</span>
+								</Link>
+							</li>
 
-					<li className={`mb-1 group ${pathname === '/admin/inspectors' ? 'active' : ''}`}>
-						<Link
-							href='/admin/inspectors'
-							className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
-							<RiUserSearchLine className='mr-3 text-lg' />
-							<span className='text-sm'>Manage Inspectors</span>
-							<i className='ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90' />
-						</Link>
-					</li>
+							<li className={`mb-1 group ${pathname === '/admin/inspectors' ? 'active' : ''}`}>
+								<Link
+									href='/admin/inspectors'
+									className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
+									<RiUserSearchLine className='mr-3 text-lg' />
+									<span className='text-sm'>Manage Inspectors</span>
+									<i className='ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90' />
+								</Link>
+							</li>
+
+							<li className={`mb-1 group ${pathname === '/admin/settings' ? 'active' : ''}`}>
+								<Link
+									href='/admin/settings'
+									className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
+									<RiSettings3Line className='mr-3 text-lg' />
+									<span className='text-sm'>Settings</span>
+									<i className='ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90' />
+								</Link>
+							</li>
+						</>
+					) : (
+						<>
+							<li className={`mb-1 group ${pathname === '/inspector' ? 'active' : ''}`}>
+								<Link
+									href='/inspector'
+									className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
+									<RiHome4Line className='mr-3 text-lg' />
+									<span className='text-sm'>Dashboard</span>
+								</Link>
+							</li>
+
+							<li className={`mb-1 group ${pathname === '/inspector/surveys' ? 'active' : ''}`}>
+								<Link
+									href='/inspector/surveys'
+									className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
+									<RiBook2Line className='mr-3 text-lg' />
+									<span className='text-sm'>Surveys</span>
+								</Link>
+							</li>
+						</>
+					)}
 				</ul>
 			</div>
 
@@ -100,6 +141,7 @@ const Layout = ({ children }) => {
 
 			<main
 				className={`w-full md:w-[calc(100%-256px)] md:ml-64 bg-gray-100 min-h-screen transition-all main`}>
+				{/* HEADER */}
 				<div className='py-4 px-6 bg-[#fff] flex items-center shadow-md shadow-black/5 sticky top-0 left-0 z-30'>
 					<button
 						type='button'
@@ -126,15 +168,29 @@ const Layout = ({ children }) => {
 							</svg>
 						</button>
 
-						<li className='dropdown ml-6'>
-							<button type='button' className='dropdown-toggle flex items-center'>
-								<FaUserCircle size={24} color='#252525' />
-							</button>
+						<li className='dropdown ml-5'>
+							<Dropdown
+								dismissOnClick={false}
+								renderTrigger={() => (
+									<button type='button' className='dropdown-toggle flex items-center'>
+										<FaUserCircle size={24} color='#252525' />
+									</button>
+								)}>
+								{/* <Dropdown.Item>
+									<Link href={'/admin/settings'} className='px-4 font-medium'>
+										Settings
+									</Link>
+								</Dropdown.Item> */}
+
+								<Dropdown.Item>
+									<div className='cursor-pointer px-4 font-medium text-red-700'>Sign out</div>
+								</Dropdown.Item>
+							</Dropdown>
 						</li>
 					</ul>
 				</div>
 
-				{children}
+				<div className='container mx-auto'>{children}</div>
 			</main>
 		</>
 	);

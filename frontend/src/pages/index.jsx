@@ -1,53 +1,78 @@
-export default function Home() {
+import { useRouter } from 'next/router';
+
+export default function Login() {
+	const router = useRouter();
+
+	const onFormSubmit = (el) => {
+		el.preventDefault();
+
+		router.push('/admin');
+	};
+
 	return (
 		<main>
-			<div className='h-screen flex flex-col md:flex-row'>
-				<div
-					className='flex h-1/2 md:w-1/2 md:h-full justify-around items-center'
-					style={{ background: 'linear-gradient(112.1deg, rgb(14, 50, 108) 11.4%, #20242f 70.2%)' }}>
-					<div className='container mx-auto p-6 md:w-3/4 text-center'>
-						<img src='/logo-xl.png' alt='' className='w-[150px] md:w-[170px] mb-5 mx-auto' />
-						{/* <h1 className='text-white font-bold text-4xl font-sans mb-4'>Bespoke audits</h1> */}
-					</div>
+			<div className='flex min-h-full flex-col justify-center p-5 pt-2 pb-8 lg:px-8'>
+				<div className='sm:mx-auto sm:w-full sm:max-w-sm'>
+					<img src='/logo-xl.png' alt='Logo' className='w-[150px] mx-auto' />
 				</div>
 
-				<div className='flex min-h-[60vh] md:w-1/2 justify-center items-center bg-white'>
-					<form className='container mx-auto p-6 w-3/4 min-w-[350px] bg-white'>
-						<h1 className='text-gray-800 font-bold text-2xl mb-6'>Welcome Back!</h1>
+				<div class='mx-auto w-full max-w-[440px] py-6 px-4 md:px-8 bg-white border border-gray-200 rounded-xl shadow-lg'>
+					<h2 className='mt-2 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900'>
+						Sign in to your account
+					</h2>
 
-						<div className='flex flex-col mb-5'>
-							<label className='font-medium text-sm mb-1.5' htmlFor=''>
-								Email Address
-							</label>
+					<div className='mt-10 mb-5 w-full'>
+						<form className='space-y-6' onSubmit={onFormSubmit}>
+							<div>
+								<label htmlFor='email' className='block text-sm font-medium leading-6 text-gray-900'>
+									Email address
+								</label>
+								<div className='mt-2'>
+									<input
+										id='email'
+										name='email'
+										type='email'
+										autoComplete='email'
+										required
+										className='block w-full rounded-md border border-gray-400 py-2 text-gray-900 placeholder:text-gray-400 !ring-0 focus:border-[#252525] sm:text-sm sm:leading-6'
+									/>
+								</div>
+							</div>
 
-							<input
-								className='px-3 border-2 py-[7px] rounded-md placeholder:text-[13px]'
-								type='text'
-								id='email'
-								placeholder='Enter your email'
-							/>
-						</div>
+							<div>
+								<div className='flex items-center justify-between'>
+									<label htmlFor='password' className='block text-sm font-medium leading-6 text-gray-900'>
+										Password
+									</label>
 
-						<div className='flex flex-col mb-5'>
-							<label className='font-medium text-sm mb-1.5' htmlFor=''>
-								Password
-							</label>
+									{/* <div className='text-sm'>
+									<a href='#' className='font-semibold text-indigo-600 hover:text-indigo-500'>
+										Forgot password?
+									</a>
+								</div> */}
+								</div>
 
-							<input
-								className='px-3 border-2 py-[7px] rounded-md placeholder:text-[13px]'
-								type='text'
-								id='password'
-								placeholder='Enter your password'
-							/>
-						</div>
+								<div className='mt-2'>
+									<input
+										id='password'
+										name='password'
+										type='password'
+										autoComplete='current-password'
+										required
+										className='block w-full rounded-md border border-gray-400 py-2 text-gray-900 placeholder:text-gray-400 !ring-0 focus:border-[#252525] sm:text-sm sm:leading-6'
+									/>
+								</div>
+							</div>
 
-						<button
-							type='submit'
-							className='block w-full py-2 rounded-md text-white font-semibold mb-2'
-							style={{ background: '#142d58' }}>
-							Login
-						</button>
-					</form>
+							<div>
+								<button
+									type='submit'
+									className='flex w-full justify-center rounded-md bg-[#252525] px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:opacity-90'>
+									Sign in
+								</button>
+							</div>
+						</form>
+					</div>
 				</div>
 			</div>
 		</main>
