@@ -155,7 +155,7 @@ const EntriesModal = ({ openModal, setOpenModal }) => {
 								{!audits.length && <p className='text-gray-700'>No audit found!</p>}
 
 								{audits.map((audit, index) => (
-									<div className='card mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg '>
+									<div key={index} className='card mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg '>
 										<span className='pr-2'>
 											<b className='text-[14px]'>#{index + 1}</b>
 										</span>
