@@ -148,31 +148,4 @@ router.post('/inspectors', async (req, res) => {
 	}
 });
 
-// ADMIN
-
-router.get('/setup', async (req, res) => {
-	try {
-		// Check if an admin already exist
-		const existingUser = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
-		if (existingUser) return res.status(409).json({ error: 'Admin has already been created!' });
-
-		// Create record
-		const hashPassword = await bcrypt.hash('admin24', 10);
-		await prisma.user.create({
-			data: {
-				name: 'Super Admin',
-				email: 'admin@bespoke.com',
-				password: hashPassword, // Hash password
-				role: 'ADMIN',
-			},
-		});
-
-		// Return response
-		res.status(200).json({ message: 'Admin setup successful!' });
-	} catch (error) {
-		const prismaError = handlePrismaError(error);
-		res.status(prismaError.status).json(prismaError.response);
-	}
-});
-
 module.exports = router;

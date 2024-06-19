@@ -5,8 +5,10 @@ const router = express.Router();
 
 const userRoutes = require('./user.routes');
 const authRoutes = require('./auth.routes');
+const { auth, onlyAdmin } = require('../middleware/auth.middleware');
 
-router.use('/', userRoutes);
-router.use('/', authRoutes);
+router.use('/auth', authRoutes);
+router.use('/users', auth, userRoutes);
+// router.use('/', auth, onlyAdmin, userRoutes);
 
 module.exports = router;
