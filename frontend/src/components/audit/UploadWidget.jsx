@@ -13,11 +13,16 @@ const UploadWidget = ({ file, setFile }) => {
 				uploadPreset: 'audit24',
 			},
 			function (error, result) {
-				// console.log(result);
-
 				// Handle the result or error here
+
 				if (result.event == 'success') {
-					setFile((prev) => ({ ...prev, url: result.info.url }));
+					// console.log(result);
+					setFile((prev) => ({
+						...prev,
+						url: result.info.url,
+						public_id: result.info.public_id,
+						asset_id: result.info.asset_id,
+					}));
 				}
 			}
 		);

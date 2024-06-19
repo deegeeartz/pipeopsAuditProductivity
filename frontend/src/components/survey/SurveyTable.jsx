@@ -47,7 +47,12 @@ const SurveyTable = ({ data, setOpenDelModal, setEntryModal }) => {
 			selector: (row) => row.campaign,
 			sortable: true,
 			minWidth: '120px',
-			hide: 'md',
+		},
+		{
+			name: 'Location',
+			selector: (row) => row.location,
+			sortable: true,
+			minWidth: '120px',
 		},
 		{
 			name: 'Start Date',
@@ -63,13 +68,13 @@ const SurveyTable = ({ data, setOpenDelModal, setEntryModal }) => {
 		},
 		{
 			name: 'Audits',
-			minWidth: '120px',
+			minWidth: '100px',
 			cell: (row) => {
 				const count = row?._count?.audits;
 				return (
 					<Badge
 						color={count > 0 ? 'success' : 'failure'}
-						onClick={() => setEntryModal(true)}
+						onClick={() => setEntryModal({ open: true, data: row })}
 						className='cursor-pointer'>
 						{count}
 						{count > 1 ? ' Entries' : ' Entry'}

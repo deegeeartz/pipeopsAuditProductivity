@@ -1,16 +1,17 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
-import { authMiddleware, userIsLoggedIn } from '@/utils/auth';
+import React, { useEffect } from 'react';
+import { useAuth } from '@/context/AuthProvider';
 
 const GuestLayout = ({ children }) => {
 	const router = useRouter();
-	const [loading, setLoading] = useState(true);
+	const { user } = useAuth();
 
 	useEffect(() => {
-		authMiddleware(router, 'guest');
-		!userIsLoggedIn() && setLoading(false);
-	}, []);
+		if (user && user?.role) {
+			router.push(`/${user.role.toLowerCase()}`);
+		}
+	}, [user, router]);
 
 	return (
 		<>
@@ -18,7 +19,7 @@ const GuestLayout = ({ children }) => {
 				<title>Bespoke Audits</title>
 			</Head>
 
-			{!loading && <main>{children}</main>}
+			<main>{children}</main>
 		</>
 	);
 };

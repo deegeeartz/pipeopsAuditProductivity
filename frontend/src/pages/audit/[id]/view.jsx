@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import Layout from '@/components/layout/DashboardLayout';
-import { RiAddFill, RiArrowLeftLine } from 'react-icons/ri';
-import Link from 'next/link';
-import { Accordion } from 'flowbite-react';
-import { FloatField, SelectField } from '@/components/Fields';
+import { RiUpload2Line } from 'react-icons/ri';
+import { Accordion, Badge } from 'flowbite-react';
+import { FloatField } from '@/components/Fields';
 import { CategoryPanel } from '@/components/QuestionUI';
 import { toast } from 'react-toastify';
 import { Loader } from '@/components/Loader';
@@ -14,14 +13,15 @@ import AuditQuestionBox from '@/components/audit/AuditQuestionBox';
 import SummaryTextField from '@/components/audit/SummaryTextField';
 import { FileModal } from '@/components/audit/FileModal';
 import Script from 'next/script';
-import { getUser } from '@/utils/auth';
+import { useAuth } from '@/context/AuthProvider';
 
 const ViewAudit = () => {
 	const router = useRouter();
+	const { user } = useAuth();
 	const { id: auditId } = router.query;
 	const [step, setStep] = useState(1);
 	const [formData, setFormData] = useState({});
-	const [audit, setAudit] = useState({});
+	const [survey, setSurvey] = useState({});
 	const [categories, setCategories] = useState([]);
 	const [responses, setResponses] = useState([]);
 	const [isLoading, setLoading] = useState(true);
@@ -34,9 +34,9 @@ const ViewAudit = () => {
 			if (res?.status == 200) {
 				console.log(res.data.result);
 
-				setAudit(res.data.result);
+				setFormData(res.data.result);
 				setResponses(res.data.result.responses);
-				setFormData(res.data.result.survey);
+				setSurvey(res.data.result.survey);
 				setCategories(res.data.result.categories);
 			}
 		} catch (error) {
@@ -61,40 +61,20 @@ const ViewAudit = () => {
 	}
 
 	const nextStep = () => {
-		console.log(formData);
+		console.log('audit: ', formData);
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 		step == 1 ? setStep(2) : setStep(1);
 	};
 
-	const handleInputChange = (questionId, field, value) => {
-		setResponses(responses.map((res) => (res.questionId === questionId ? { ...res, [field]: value } : res)));
+	const countFilledQuestions = (questions) => {
+		return questions.filter((question) => {
+			const response = responses.find((r) => r.questionId == question.id);
+			return response && (response.answer.trim() || response.optionAnswer || response.skip);
+		}).length;
 	};
 
-	const onFormSubmit = async (el) => {
-		el.preventDefault();
-
-		const payload = {
-			expense: formData?.expense,
-			brandStandard: formData?.brandStandard,
-			executiveSummary: formData?.executiveSummary,
-			detailedSummary: formData?.detailedSummary,
-			Scenario: formData?.Scenario,
-			status: formData?.status || 'in progress',
-			auditId,
-			responses,
-		};
-
-		// return console.log(payload);
-
-		try {
-			const res = await http.post('/audit', payload);
-			if (res?.status == 201) {
-				toast.success(res.data.message);
-				router.push('/inspector');
-			}
-		} catch (error) {
-			errorHandler(error);
-		}
+	const handleInputChange = (questionId, field, value) => {
+		setResponses(responses.map((res) => (res.questionId === questionId ? { ...res, [field]: value } : res)));
 	};
 
 	return (
@@ -104,40 +84,34 @@ const ViewAudit = () => {
 			<div className='content p-6'>
 				<div className='mb-7 flex justify-between items-center'>
 					<h1 className='font-bold text-lg text-[#222]'>Audit #{auditId}</h1>
-
-					{/* <Link href='/inspector/surveys' className='btn_primary _flex'>
-						<RiArrowLeftLine className='mr-2 h-5 w-5' />
-						<span className='hidden md:block'>All Surveys</span>
-					</Link> */}
 				</div>
 
 				<div className='py-7 px-5 mb-8 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
-					<form className='w-full readOnly' onSubmit={onFormSubmit}>
+					<form className='w-full readOnly'>
+						{/* STEP 1 */}
 						<div className={`step1 details ${step !== 1 && 'hidden'}`}>
 							<h3 className='heading text-xl font-semibold mb-8 uppercase'>Survey Details</h3>
 
 							<div className='mb-5'>
-								<SelectField label={'Client'} value={formData.clientId ?? ''} disable={true}>
-									<option value={formData.clientId}>{formData.clientName}</option>
-								</SelectField>
+								<FloatField label={'Client'} value={survey.clientName || ''} readOnly />
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Hotel Name'} value={formData.hotelName ?? ''} readOnly />
+								<FloatField label={'Hotel Name'} value={survey.hotelName || ''} readOnly />
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Campaign'} value={formData.campaign ?? ''} readOnly />
+								<FloatField label={'Campaign'} value={survey.campaign || ''} readOnly />
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Location'} value={formData.location ?? ''} readOnly />
+								<FloatField label={'Location'} value={survey.location || ''} readOnly />
 							</div>
 
 							<div className='mb-5'>
 								<FloatField
 									label={'Start Date'}
-									value={new Date(formData.startDate).toDateString() ?? ''}
+									value={new Date(survey.startDate).toDateString() || ''}
 									readOnly
 								/>
 							</div>
@@ -145,23 +119,32 @@ const ViewAudit = () => {
 							<div className='mb-5'>
 								<FloatField
 									label={'End Date'}
-									value={new Date(formData.endDate).toDateString() ?? ''}
+									value={new Date(survey.endDate).toDateString() || ''}
 									readOnly
 								/>
 							</div>
 						</div>
 
+						{/* STEP 2 */}
 						<div className={`step2 questionnaire ${step !== 2 && 'hidden'}`}>
-							<h3 className='heading text-xl font-semibold pt-4 mb-8 uppercase'>Questionnaire</h3>
+							<h3 className='heading text-xl font-semibold mb-8 uppercase flex items-center'>
+								<span>Questionnaire</span>
+								<Badge color='dark' className='px-3 ml-4'>
+									{survey?.questions.length}
+								</Badge>
+							</h3>
 
-							{!formData?.questions?.length ? (
+							{!survey?.questions?.length ? (
 								<p className='text-gray-400 mb-4'>No questions found!</p>
 							) : (
 								<div className='mb-5'>
 									<Accordion>
 										{categories.map((category) => (
 											<Accordion.Panel key={category.id} className='box'>
-												<CategoryPanel title={category.title} count={category.questions.length}>
+												<CategoryPanel
+													title={category.title}
+													filledCount={countFilledQuestions(category.questions)}
+													count={category.questions.length}>
 													{/* Display questions */}
 													{category.questions.map((question, index) => (
 														<AuditQuestionBox
@@ -171,6 +154,7 @@ const ViewAudit = () => {
 															handleInputChange={handleInputChange}
 															responses={responses}
 															setFileModal={setFileModal}
+															view={true}
 														/>
 													))}
 												</CategoryPanel>
@@ -184,32 +168,32 @@ const ViewAudit = () => {
 
 							<Accordion>
 								<Accordion.Panel className='box'>
-									<CategoryPanel title={'Brand Standard'}>
-										<SummaryTextField value={audit?.brandStandard ?? ''} readOnly />
+									<CategoryPanel title={'Brand Standard'} summaryField={formData?.brandStandard || ''}>
+										<SummaryTextField value={formData?.brandStandard || ''} readOnly />
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
-									<CategoryPanel title={'Executive Summary'}>
-										<SummaryTextField value={audit?.executiveSummary ?? ''} readOnly />
+									<CategoryPanel title={'Executive Summary'} summaryField={formData?.executiveSummary || ''}>
+										<SummaryTextField value={formData?.executiveSummary || ''} readOnly />
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
-									<CategoryPanel title={'Detailed Summary'}>
-										<SummaryTextField value={audit?.detailedSummary ?? ''} readOnly />
+									<CategoryPanel title={'Detailed Summary'} summaryField={formData?.detailedSummary || ''}>
+										<SummaryTextField value={formData?.detailedSummary || ''} readOnly />
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
-									<CategoryPanel title={'Scenario'}>
-										<SummaryTextField value={audit?.Scenario ?? ''} readOnly />
+									<CategoryPanel title={'Scenario'} summaryField={formData?.scenario || ''}>
+										<SummaryTextField value={formData?.scenario || ''} readOnly />
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
-									<CategoryPanel title={'Expense'}>
-										<SummaryTextField value={audit?.expense ?? ''} readOnly />
+									<CategoryPanel title={'Expense'} summaryField={formData?.expense || ''}>
+										<SummaryTextField value={formData?.expense || ''} readOnly />
 									</CategoryPanel>
 								</Accordion.Panel>
 							</Accordion>
@@ -219,7 +203,7 @@ const ViewAudit = () => {
 
 								<select
 									className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-white focus:border-[#252525] block w-full p-2.5 '
-									value={audit.status || ''}
+									defaultValue={formData.status || ''}
 									readOnly
 									disabled
 									//
@@ -237,7 +221,7 @@ const ViewAudit = () => {
 								{step == 1 ? 'Next' : 'Previous'}
 							</button>
 
-							{getUser().role == 'CLIENT' && (
+							{survey.clientId == user?.id && (
 								<button type='submit' className='btn_primary _flex !px-[5px] !py-[10px] md:!px-[30px]'>
 									<RiAddFill size={22} className='mr-1.5' />
 									<span>Submit Feedback</span>
@@ -249,7 +233,12 @@ const ViewAudit = () => {
 			</div>
 
 			{fileModal.open && (
-				<FileModal openModal={fileModal} setOpenModal={setFileModal} handleInputChange={handleInputChange} />
+				<FileModal
+					openModal={fileModal}
+					setOpenModal={setFileModal}
+					handleInputChange={handleInputChange}
+					view={true}
+				/>
 			)}
 		</Layout>
 	);

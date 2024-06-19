@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Layout from '@/components/layout/DashboardLayout';
 import { RiAddFill, RiArrowLeftLine } from 'react-icons/ri';
 import Link from 'next/link';
-import { Accordion } from 'flowbite-react';
+import { Accordion, Badge } from 'flowbite-react';
 import { FloatField, SelectField } from '@/components/Fields';
 import { CategoryPanel } from '@/components/QuestionUI';
 import { toast } from 'react-toastify';
@@ -71,6 +71,13 @@ const StartAudit = () => {
 		step == 1 ? setStep(2) : setStep(1);
 	};
 
+	const countFilledQuestions = (questions) => {
+		return questions.filter((question) => {
+			const response = responses.find((r) => r.questionId == question.id);
+			return response && (response.answer.trim() || response.optionAnswer || response.skip);
+		}).length;
+	};
+
 	const handleInputChange = (questionId, field, value) => {
 		setResponses(responses.map((res) => (res.questionId === questionId ? { ...res, [field]: value } : res)));
 	};
@@ -83,7 +90,7 @@ const StartAudit = () => {
 			brandStandard: formData?.brandStandard,
 			executiveSummary: formData?.executiveSummary,
 			detailedSummary: formData?.detailedSummary,
-			Scenario: formData?.Scenario,
+			scenario: formData?.scenario,
 			status: formData?.status || 'in progress',
 			surveyId,
 			responses,
@@ -109,40 +116,34 @@ const StartAudit = () => {
 			<div className='content p-6'>
 				<div className='mb-7 flex justify-between items-center'>
 					<h1 className='font-bold text-lg text-[#222]'>Survey #{surveyId}</h1>
-
-					<Link href='/inspector/surveys' className='btn_primary _flex'>
-						<RiArrowLeftLine className='mr-2 h-5 w-5' />
-						<span className='hidden md:block'>All Surveys</span>
-					</Link>
 				</div>
 
 				<div className='py-7 px-5 mb-8 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
 					<form className='w-full readOnly' onSubmit={onFormSubmit}>
+						{/* STEP 1 */}
 						<div className={`step1 details ${step !== 1 && 'hidden'}`}>
 							<h3 className='heading text-xl font-semibold mb-8 uppercase'>Survey Details</h3>
 
 							<div className='mb-5'>
-								<SelectField label={'Client'} value={formData.clientId ?? ''} disable={true}>
-									<option value={formData.clientId}>{formData.clientName}</option>
-								</SelectField>
+								<FloatField label={'Client'} value={formData.clientName || ''} readOnly />
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Hotel Name'} value={formData.hotelName ?? ''} readOnly />
+								<FloatField label={'Hotel Name'} value={formData.hotelName || ''} readOnly />
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Campaign'} value={formData.campaign ?? ''} readOnly />
+								<FloatField label={'Campaign'} value={formData.campaign || ''} readOnly />
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Location'} value={formData.location ?? ''} readOnly />
+								<FloatField label={'Location'} value={formData.location || ''} readOnly />
 							</div>
 
 							<div className='mb-5'>
 								<FloatField
 									label={'Start Date'}
-									value={new Date(formData.startDate).toDateString() ?? ''}
+									value={new Date(formData.startDate).toDateString() || ''}
 									readOnly
 								/>
 							</div>
@@ -150,23 +151,32 @@ const StartAudit = () => {
 							<div className='mb-5'>
 								<FloatField
 									label={'End Date'}
-									value={new Date(formData.endDate).toDateString() ?? ''}
+									value={new Date(formData.endDate).toDateString() || ''}
 									readOnly
 								/>
 							</div>
 						</div>
 
+						{/* STEP 2 */}
 						<div className={`step2 questionnaire ${step !== 2 && 'hidden'}`}>
-							<h3 className='heading text-xl font-semibold pt-4 mb-8 uppercase'>Questionnaire</h3>
+							<h3 className='heading text-xl font-semibold mb-8 uppercase flex items-center'>
+								<span>Questionnaire</span>
+								<Badge color='dark' className='px-3 ml-4'>
+									{formData?.questions.length}
+								</Badge>
+							</h3>
 
 							{!formData?.questions?.length ? (
-								<p className='text-gray-400 mb-4'>No questions added!</p>
+								<p className='text-gray-400 mb-4'>No questions found!</p>
 							) : (
 								<div className='mb-5'>
 									<Accordion>
 										{categories.map((category) => (
 											<Accordion.Panel key={category.id} className='box'>
-												<CategoryPanel title={category.title} count={category.questions.length}>
+												<CategoryPanel
+													title={category.title}
+													filledCount={countFilledQuestions(category.questions)}
+													count={category.questions.length}>
 													{/* Display questions */}
 													{category.questions.map((question, index) => (
 														<AuditQuestionBox
@@ -189,45 +199,45 @@ const StartAudit = () => {
 
 							<Accordion>
 								<Accordion.Panel className='box'>
-									<CategoryPanel title={'Brand Standard'}>
+									<CategoryPanel title={'Brand Standard'} summaryField={formData?.brandStandard || ''}>
 										<SummaryTextField
-											value={formData?.brandStandard ?? ''}
+											value={formData?.brandStandard || ''}
 											onChange={(el) => setFormData({ ...formData, brandStandard: el.target.value })}
 										/>
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
-									<CategoryPanel title={'Executive Summary'}>
+									<CategoryPanel title={'Executive Summary'} summaryField={formData?.executiveSummary || ''}>
 										<SummaryTextField
-											value={formData?.executiveSummary ?? ''}
+											value={formData?.executiveSummary || ''}
 											onChange={(el) => setFormData({ ...formData, executiveSummary: el.target.value })}
 										/>
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
-									<CategoryPanel title={'Detailed Summary'}>
+									<CategoryPanel title={'Detailed Summary'} summaryField={formData?.detailedSummary || ''}>
 										<SummaryTextField
-											value={formData?.detailedSummary ?? ''}
+											value={formData?.detailedSummary || ''}
 											onChange={(el) => setFormData({ ...formData, detailedSummary: el.target.value })}
 										/>
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
-									<CategoryPanel title={'Scenario'}>
+									<CategoryPanel title={'Scenario'} summaryField={formData?.scenario || ''}>
 										<SummaryTextField
-											value={formData?.Scenario ?? ''}
-											onChange={(el) => setFormData({ ...formData, Scenario: el.target.value })}
+											value={formData?.scenario || ''}
+											onChange={(el) => setFormData({ ...formData, scenario: el.target.value })}
 										/>
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
-									<CategoryPanel title={'Expense'}>
+									<CategoryPanel title={'Expense'} summaryField={formData?.expense || ''}>
 										<SummaryTextField
-											value={formData?.expense ?? ''}
+											value={formData?.expense || ''}
 											onChange={(el) => setFormData({ ...formData, expense: el.target.value })}
 										/>
 									</CategoryPanel>

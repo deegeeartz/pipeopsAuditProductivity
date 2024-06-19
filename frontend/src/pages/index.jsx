@@ -1,45 +1,15 @@
 import GuestLayout from '@/components/layout/GuestLayout';
-import { API_URL } from '@/config/axios';
-import axios from 'axios';
-import { useRouter } from 'next/router';
+import { useAuth } from '@/context/AuthProvider';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
 
 export default function Login() {
-	const router = useRouter();
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-	} = useForm();
+	const { register, handleSubmit } = useForm();
+	const { login } = useAuth();
 
 	const onFormSubmit = async (data) => {
-		console.log(errors);
-		console.log('data ', data);
-
-		try {
-			const { email, password } = data;
-			const res = await axios.post(API_URL + '/auth/login', { email, password });
-			// console.log(res);
-
-			if (res.status && res.data.token) {
-				const user = res.data.user;
-				const token = res.data.token;
-				toast.success(res.data.message);
-
-				// console.log(user);
-				localStorage.setItem('user', JSON.stringify(user));
-				localStorage.setItem('token', token);
-
-				router.push(`/${user.role.toLowerCase()}`);
-			}
-		} catch (error) {
-			console.log(error);
-			if (error.name == 'AxiosError' && error?.response?.data?.error) {
-				return toast.error(error.response.data.error);
-			}
-			return toast.error('An error ocurred. Please try again!');
-		}
+		console.log('data: ', data);
+		const { email, password } = data;
+		await login(email, password);
 	};
 
 	return (

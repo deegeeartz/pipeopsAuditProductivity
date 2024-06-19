@@ -2,9 +2,10 @@ const { Button } = require('flowbite-react');
 const { FloatField } = require('../Fields');
 const { FaPlus } = require('react-icons/fa');
 
-const AuditQuestionBox = ({ id, question, handleInputChange, responses, setFileModal }) => {
+const AuditQuestionBox = ({ id, question, handleInputChange, responses, setFileModal, view }) => {
 	const response = responses.find((res) => res.questionId === question.id);
-	console.log(response);
+	const fileData = typeof response.files === 'string' ? JSON.parse(response.files) : response.files;
+	// console.log(response.answer, fileData);
 
 	const showFileModal = () => {
 		console.log(response);
@@ -29,6 +30,7 @@ const AuditQuestionBox = ({ id, question, handleInputChange, responses, setFileM
 								className='w-4 h-4 border-gray-300 focus:ring-0 !ring-white'
 								checked={response.optionAnswer === key}
 								onChange={() => handleInputChange(question.id, 'optionAnswer', key)}
+								disabled={view}
 							/>
 							<label htmlFor={'key' + key} className='block ms-2 text-sm font-normal'>
 								{value}
@@ -44,6 +46,7 @@ const AuditQuestionBox = ({ id, question, handleInputChange, responses, setFileM
 						label='Enter Comment'
 						value={response.answer}
 						onChange={(e) => handleInputChange(question.id, 'answer', e.target.value)}
+						disabled={view}
 					/>
 				</div>
 
@@ -54,6 +57,7 @@ const AuditQuestionBox = ({ id, question, handleInputChange, responses, setFileM
 						className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:!ring-white'
 						checked={response.skip}
 						onChange={(e) => handleInputChange(question.id, 'skip', e.target.checked)}
+						disabled={view}
 					/>
 					<label htmlFor={'skip_' + question.id} className='ms-2 text-sm font-medium text-gray-900'>
 						N/A
@@ -67,7 +71,7 @@ const AuditQuestionBox = ({ id, question, handleInputChange, responses, setFileM
 						className='text-nowrap [&>span]:items-center !ring-gray-200'
 						onClick={showFileModal}>
 						<FaPlus className='mr-2 text-[16px]' />
-						File <span className='pl-2 ml-2 border-l'>{response?.files?.length || 0}</span>
+						File <span className='pl-2 ml-2 border-l'>{fileData.length || 0}</span>
 					</Button>
 				</div>
 			</div>

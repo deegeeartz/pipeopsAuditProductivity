@@ -3,6 +3,7 @@ import 'react-toastify/dist/ReactToastify.min.css';
 import { Poppins } from 'next/font/google';
 import { ToastContainer } from 'react-toastify';
 import Head from 'next/head';
+import { AuthProvider } from '@/context/AuthProvider';
 
 const font = Poppins({ weight: ['300', '400', '500', '600', '700'], subsets: ['latin'] });
 
@@ -14,19 +15,11 @@ export default function App({ Component, pageProps }) {
 				<link rel='icon' href='/icon.png' type='image/PNG' />
 			</Head>
 
-			<Component {...pageProps} />
+			<AuthProvider>
+				<Component {...pageProps} />
+			</AuthProvider>
 
-			<ToastContainer
-				// position='top-right'
-				// autoClose={5000}
-				// hideProgressBar={false}
-				// newestOnTop={true}
-				closeOnClick
-				pauseOnFocusLoss={false}
-				// draggable
-				// pauseOnHover
-				// theme='light'
-			/>
+			<ToastContainer closeOnClick pauseOnFocusLoss={false} />
 		</div>
 	);
 }

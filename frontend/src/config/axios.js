@@ -1,22 +1,18 @@
 import axios from 'axios';
-import { getToken, logOutUser } from '../utils/auth';
-import { toast } from 'react-toastify';
+import Cookies from 'js-cookie';
 
-// axios config for server
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
+// axios config for server
 const http = axios.create({
 	baseURL: API_URL,
 	timeout: 10000,
 	headers: { 'Content-Type': 'application/json' },
 });
 
-// Alter defaults after instance has been created
-// http.defaults.headers.common['Authorization'] = getToken();
-
 // Interceptor
 http.interceptors.request.use(function (config) {
-	const token = getToken();
+	const token = Cookies.get('token');
 	if (token) {
 		config.headers.Authorization = `Bearer ${token}`;
 	}
@@ -31,9 +27,9 @@ http.interceptors.response.use(
 
 		const { status, data } = error.response;
 		if (status == 401 || data?.errorObject?.name === 'TokenExpiredError') {
-			toast.error(error.response.data?.error ?? 'Invalid Token! Please login again.');
-			logOutUser();
-			return;
+			// toast.error(error.response.data?.error ?? 'Invalid Token! Please login again.');
+			Cookies.remove('user');
+			Cookies.remove('token');
 		}
 
 		return Promise.reject(error);

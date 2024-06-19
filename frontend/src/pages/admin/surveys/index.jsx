@@ -10,12 +10,14 @@ import http from '@/config/axios';
 import { errorHandler } from '@/utils/errorHandler';
 import SearchBox from '@/components/SearchBox';
 import { toast } from 'react-toastify';
+import { useAuth } from '@/context/AuthProvider';
 
 const SurveyTable = dynamic(() => import('@/components/survey/SurveyTable'), { ssr: false, loading: Loader });
 
 const Surveys = () => {
+	const { user } = useAuth();
 	const [openDelModal, setOpenDelModal] = useState({ open: false, data: null });
-	const [entryModal, setEntryModal] = useState(false);
+	const [entryModal, setEntryModal] = useState({ open: false, data: null });
 	const [data, setData] = useState([]);
 	const [isLoading, setLoading] = useState(true);
 	const [searchTerm, setSearchTerm] = useState('');
@@ -38,7 +40,7 @@ const Surveys = () => {
 		fetchData();
 	}, []);
 
-	if (isLoading) {
+	if (!user || isLoading) {
 		return (
 			<div className='h-screen grid items-center'>
 				<Loader />
@@ -106,12 +108,37 @@ const Surveys = () => {
 					deleteRecord={deleteRecord}
 				/>
 			)}
-			{entryModal && <EntriesModal openModal={entryModal} setOpenModal={setEntryModal} data={data} />}
+
+			{entryModal.open && <EntriesModal openModal={entryModal} setOpenModal={setEntryModal} survey={data} />}
 		</Layout>
 	);
 };
 
-const EntriesModal = ({ openModal, setOpenModal, data }) => {
+const EntriesModal = ({ openModal, setOpenModal }) => {
+	const [isLoading, setLoading] = useState(true);
+	const survey = openModal.data;
+	const surveyId = survey.id;
+	const [audits, setAudits] = useState([]);
+
+	const fetchData = async () => {
+		try {
+			const res = await http.get('/audit/survey/' + surveyId);
+			if (res?.status == 200) {
+				console.log('audit', res.data);
+				setAudits(res.data.result);
+			}
+		} catch (error) {
+			errorHandler(error);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		console.log(survey);
+		fetchData();
+	}, []);
+
 	return (
 		<>
 			<Modal dismissible position={'center'} show={openModal} onClose={() => setOpenModal(false)}>
@@ -119,52 +146,42 @@ const EntriesModal = ({ openModal, setOpenModal, data }) => {
 
 				<Modal.Body>
 					<div className='space-y-6'>
-						<div>
-							<div className='card mb-4 grid gap-3 md:flex justify-between items-center p-3 bg-gray-50 border border-gray-200 rounded-lg '>
-								<span className='pr-2'>
-									<b>#1</b>
-								</span>
-								<span className='pr-2'>
-									<b>Inspector:</b> Mr. David
-								</span>
-								<span className='pr-2'>
-									<b>Date:</b> April 18, 2024
-								</span>
-								<Link href={'#'} className='btn_primary px-4'>
-									View
-								</Link>
+						{isLoading ? (
+							<div className='h-full grid items-center'>
+								<Loader />
 							</div>
+						) : (
+							<div>
+								{!audits.length && <p className='text-gray-700'>No audit found!</p>}
 
-							<div className='card mb-4 grid gap-3 md:flex justify-between items-center p-3 bg-gray-50 border border-gray-200 rounded-lg '>
-								<span className='pr-2'>
-									<b>#2</b>
-								</span>
-								<span className='pr-2'>
-									<b>Inspector:</b> Mr. David
-								</span>
-								<span className='pr-2'>
-									<b>Date:</b> April 18, 2024
-								</span>
-								<Link href={'#'} className='btn_primary px-4'>
-									View
-								</Link>
-							</div>
+								{audits.map((audit, index) => (
+									<div className='card mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg '>
+										<span className='pr-2'>
+											<b className='text-[14px]'>#{index + 1}</b>
+										</span>
 
-							<div className='card mb-4 grid gap-3 md:flex justify-between items-center p-3 bg-gray-50 border border-gray-200 rounded-lg '>
-								<span className='pr-2'>
-									<b>#3</b>
-								</span>
-								<span className='pr-2'>
-									<b>Inspector:</b> Mr. David
-								</span>
-								<span className='pr-2'>
-									<b>Date:</b> April 18, 2024
-								</span>
-								<Link href={'#'} className='btn_primary px-4'>
-									View
-								</Link>
+										<div className='pt-2 pb-4 grid gap-1 md:flex flex-wrap justify-between items-center '>
+											<span className='pr-2'>
+												<b className='text-[14px]'>Inspector: </b> {audit.inspectorName}
+											</span>
+
+											<span className='pr-2'>
+												<b className='text-[14px]'>Status: </b> {audit.status}
+											</span>
+
+											<span className='pr-2'>
+												<b className='text-[14px]'>Date Added: </b>
+												{audit.createdAt}
+											</span>
+										</div>
+
+										<Link href={`/audit/${audit.id}/view`} className='btn_primary px-4'>
+											View
+										</Link>
+									</div>
+								))}
 							</div>
-						</div>
+						)}
 					</div>
 				</Modal.Body>
 			</Modal>
