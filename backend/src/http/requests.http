@@ -1,0 +1,56 @@
+
+GET http://localhost:8080/api/
+
+###
+
+POST http://localhost:8080/api/auth/login 
+content-type: application/json
+
+{
+	"email": "admin@bespoke.com",
+	"password": "admin24"
+}
+
+###
+
+GET http://localhost:8080/api/user/clients
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzE2Mzg3OTE1LCJleHAiOjE3MTY2NDcxMTV9.RbiQI5y08jYbD4WvxbJ2NDjJh4ctstevqiS_2bHZLkQ
+
+###
+
+POST http://localhost:8080/api/user/clients 
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzE2Mzg3OTE1LCJleHAiOjE3MTY2NDcxMTV9.RbiQI5y08jYbD4WvxbJ2NDjJh4ctstevqiS_2bHZLkQ
+
+{
+	"hotelName": "Hotel Dave",
+	"location": "London",
+	"additionalNotes": "This is a note",
+	"name": "Emmanuel",
+	"email": "emma45@test.com",
+	"password": "#password2345"
+}
+
+###
+
+GET http://localhost:8080/api/inspectors/
+
+###
+
+POST http://localhost:8080/api/inspectors 
+content-type: application/json
+
+{
+	"location": "London UK",
+	"language": "English",
+	"phoneNumber": "090446344354",
+	"name": "Emmanuel 2",
+	"email": "emma63@test.com",
+	"password": "#password2345"
+}
+
+###
+
+GET  http://localhost:8080/api/auth/setup 
+
+###

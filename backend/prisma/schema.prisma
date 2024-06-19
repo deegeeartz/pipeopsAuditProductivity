@@ -13,6 +13,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// USERS
+
 enum Role {
   ADMIN
   CLIENT
@@ -26,6 +28,7 @@ model User {
   role     Role
   name     String?
 
+  // Relationships
   client    Client?
   inspector Inspector?
 
@@ -36,12 +39,14 @@ model User {
 model Client {
   id     Int  @id @default(autoincrement())
   user   User @relation(fields: [userId], references: [id])
-  userId Int  @unique // relation scalar field (used in the `@relation` attribute above)
+  userId Int  @unique
 
   hotelName       String
   location        String?
   additionalNotes String?
   passcode        String?
+
+  survey Survey[]
 }
 
 model Inspector {
@@ -54,4 +59,45 @@ model Inspector {
   language    String?
   phoneNumber String?
   passcode    String?
+}
+
+// SURVEY
+
+model Survey {
+  id Int @id @default(autoincrement())
+
+  hotelName  String
+  campaign   String?
+  location   String?
+  startDate  DateTime?
+  endDate    DateTime?
+  inspectors Json?
+  clientName String?
+  clientId   Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  questions Question[]
+  client    Client     @relation(fields: [clientId], references: [id])
+}
+
+model Category {
+  id        Int        @id @default(autoincrement())
+  title     String
+  questions Question[]
+}
+
+model Question {
+  id         Int    @id @default(autoincrement())
+  type       String
+  text       String
+  options    Json
+  categoryId Int
+  surveyId   Int
+
+  // Relationships
+  category Category @relation(fields: [categoryId], references: [id])
+  survey   Survey   @relation(fields: [surveyId], references: [id])
 }

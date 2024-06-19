@@ -3,10 +3,17 @@ const router = express.Router();
 // const { PrismaClient } = require('@prisma/client');
 // const prisma = new PrismaClient();
 
-const userRoutes = require('./user.routes');
+const { auth, onlyAdmin } = require('../middleware/auth.middleware');
 const authRoutes = require('./auth.routes');
+const categoryRoutes = require('./admin/category.routes');
+const inspectorRoutes = require('./admin/inspector.routes');
+const clientRoutes = require('./admin/client.routes');
+const surveyRoutes = require('./admin/survey.routes');
 
-router.use('/', userRoutes);
-router.use('/', authRoutes);
+router.use('/auth', authRoutes);
+router.use('/category', auth, categoryRoutes);
+router.use('/client', auth, clientRoutes);
+router.use('/inspector', auth, inspectorRoutes);
+router.use('/survey', auth, surveyRoutes);
 
 module.exports = router;
