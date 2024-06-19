@@ -23,28 +23,29 @@ const Layout = ({ children }) => {
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 
 	useEffect(() => {
-		const userData = Cookies.get('user');
+		const userData = Cookies.get('user') ? JSON.parse(Cookies.get('user')) : null;
 
 		// Role Authorization
 		if (userData) {
-			if (user.role === 'ADMIN') {
+			setUser(userData);
+			if (userData.role === 'ADMIN') {
 				return; // Admin has access to all routes
 			}
 
-			if (user.role !== 'ADMIN' && pathname.includes('/admin')) {
-				router.push(`/${user.role.toLowerCase()}`);
+			if (userData.role !== 'ADMIN' && pathname.includes('/admin')) {
+				router.push(`/${userData.role.toLowerCase()}`);
 			}
-			if (user.role !== 'INSPECTOR' && pathname.includes('/inspector')) {
-				router.push(`/${user.role.toLowerCase()}`);
+			if (userData.role !== 'INSPECTOR' && pathname.includes('/inspector')) {
+				router.push(`/${userData.role.toLowerCase()}`);
 			}
-			if (user.role !== 'CLIENT' && pathname.includes('/client')) {
-				router.push(`/${user.role.toLowerCase()}`);
+			if (userData.role !== 'CLIENT' && pathname.includes('/client')) {
+				router.push(`/${userData.role.toLowerCase()}`);
 			}
 		} else {
 			setUser(null);
 			router.push('/');
 		}
-	}, [user, router]);
+	}, [router]);
 
 	const toggleSidebar = () => {
 		setSidebarOpen(!sidebarOpen);
@@ -152,6 +153,19 @@ const Layout = ({ children }) => {
 									className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
 									<RiBook2Line className='mr-3 text-lg' />
 									<span className='text-sm'>Surveys</span>
+								</Link>
+							</li>
+						</>
+					)}
+
+					{user?.role == 'CLIENT' && (
+						<>
+							<li className={`mb-1 group ${pathname === '/client' ? 'active' : ''}`}>
+								<Link
+									href='/client'
+									className={`pl-2 flex font-semibold items-center py-3 text-gray-900 hover:bg-gray-800 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white`}>
+									<RiHome4Line className='mr-3 text-lg' />
+									<span className='text-sm'>Dashboard</span>
 								</Link>
 							</li>
 						</>

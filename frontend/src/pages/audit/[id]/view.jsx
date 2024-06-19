@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Layout from '@/components/layout/DashboardLayout';
-import { RiUpload2Line } from 'react-icons/ri';
+import { RiUpload2Line, RiUploadLine } from 'react-icons/ri';
 import { Accordion, Badge } from 'flowbite-react';
 import { FloatField } from '@/components/Fields';
 import { CategoryPanel } from '@/components/QuestionUI';
@@ -77,6 +77,26 @@ const ViewAudit = () => {
 		setResponses(responses.map((res) => (res.questionId === questionId ? { ...res, [field]: value } : res)));
 	};
 
+	const onFormSubmit = async (el) => {
+		el.preventDefault();
+		const { feedback } = formData;
+
+		console.log('feedback', feedback);
+		if (!feedback?.trim()) {
+			return toast.error('Feedback field is required!');
+		}
+
+		const payload = { feedback: feedback?.trim() };
+		try {
+			const res = await http.patch(`/audit/${auditId}/feedback`, payload);
+			if (res?.status == 200) {
+				toast.success(res.data.message);
+			}
+		} catch (error) {
+			errorHandler(error);
+		}
+	};
+
 	return (
 		<Layout>
 			<Script src='https://upload-widget.cloudinary.com/global/all.js' type='text/javascript'></Script>
@@ -87,7 +107,7 @@ const ViewAudit = () => {
 				</div>
 
 				<div className='py-7 px-5 mb-8 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
-					<form className='w-full readOnly'>
+					<form className='w-full readOnly' onSubmit={onFormSubmit}>
 						{/* STEP 1 */}
 						<div className={`step1 details ${step !== 1 && 'hidden'}`}>
 							<h3 className='heading text-xl font-semibold mb-8 uppercase'>Survey Details</h3>
@@ -214,6 +234,16 @@ const ViewAudit = () => {
 									<option value={'completed'}>Completed</option>
 								</select>
 							</div>
+
+							<div className='py-5 mt-4'>
+								<p className='text-[15px] font-medium pb-2'>Feedback</p>
+
+								<SummaryTextField
+									value={formData?.feedback || ''}
+									onChange={(el) => setFormData({ ...formData, feedback: el.target.value })}
+									readOnly={survey.clientId !== user?.client?.id}
+								/>
+							</div>
 						</div>
 
 						<div className='py-5 _flex'>
@@ -221,9 +251,9 @@ const ViewAudit = () => {
 								{step == 1 ? 'Next' : 'Previous'}
 							</button>
 
-							{survey.clientId == user?.id && (
+							{step == 2 && survey.clientId == user?.client?.id && (
 								<button type='submit' className='btn_primary _flex !px-[5px] !py-[10px] md:!px-[30px]'>
-									<RiAddFill size={22} className='mr-1.5' />
+									<RiUploadLine size={22} className='mr-1.5' />
 									<span>Submit Feedback</span>
 								</button>
 							)}

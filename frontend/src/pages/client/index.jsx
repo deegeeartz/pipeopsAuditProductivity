@@ -4,7 +4,7 @@ import DeleteModal from '@/components/DeleteModal';
 import { Loader } from '@/components/Loader';
 import { Badge } from 'flowbite-react';
 import dynamic from 'next/dynamic';
-import { RiDeleteBin4Fill, RiEdit2Fill, RiEditLine, RiEyeFill, RiPlayLine } from 'react-icons/ri';
+import { RiCheckboxCircleLine, RiCheckLine, RiEyeFill } from 'react-icons/ri';
 import Link from 'next/link';
 import SearchBox from '@/components/SearchBox';
 import http from '@/config/axios';
@@ -20,7 +20,8 @@ const ClientAudits = () => {
 
 	const fetchData = async () => {
 		try {
-			const res = await http.get('/audit/inspector');
+			const res = await http.get('/audit/client');
+
 			if (res?.status == 200) {
 				console.log('fetchData:', res.data);
 				setData(res.data.result);
@@ -75,8 +76,8 @@ const ClientAudits = () => {
 		{
 			name: 'Detailed Summary',
 			selector: (row) => (
-				<Badge color={row.detailedSummary ? 'success' : 'gray'} className='cursor-pointer'>
-					{row.detailedSummary ? 'Completed' : 'N/A '}
+				<Badge color={row.detailedSummary ? 'success' : 'warning'} className='cursor-pointer'>
+					{row.detailedSummary ? 'Done' : 'N/A '}
 				</Badge>
 			),
 			sortable: true,
@@ -87,7 +88,9 @@ const ClientAudits = () => {
 			minWidth: '120px',
 			cell: (row) => {
 				return (
-					<Badge color={row.status == 'done' ? 'success' : 'warning'} className='cursor-pointer capitalize'>
+					<Badge
+						color={row.status == 'completed' ? 'success' : 'warning'}
+						className='cursor-pointer capitalize'>
 						{row.status || 'in progress'}
 					</Badge>
 				);
@@ -99,7 +102,7 @@ const ClientAudits = () => {
 			cell: (row) => {
 				return (
 					<Badge color={row.feedback ? 'success' : 'gray'} className='cursor-pointer'>
-						{row.feedback ? 'Yes' : 'N/A '}
+						{row.feedback ? <RiCheckboxCircleLine size={18} className='mx-2' /> : 'N/A '}
 					</Badge>
 				);
 			},
@@ -116,17 +119,9 @@ const ClientAudits = () => {
 			'text-[17px] cursor-pointer rounded-sm p-1 text-[#252525] border border-gray-300 hover:bg-gray-200 fx_center';
 		return (
 			<div className='flex gap-x-4'>
-				<Link href={`audit/${id}/edit`} className={`${style}`}>
-					<RiEyeFill />
+				<Link href={`audit/${id}/view`} className={`${style}`}>
+					<RiEyeFill /> <span className='px-1 text-xs'>View</span>
 				</Link>
-
-				<Link href={`audit/${id}/edit`} className={`${style}`}>
-					<RiEdit2Fill />
-				</Link>
-
-				{/* <div className={`${style}`} onClick={() => setOpenDelModal({ open: true, id })}>
-					<RiDeleteBin4Fill />
-				</div> */}
 			</div>
 		);
 	};
