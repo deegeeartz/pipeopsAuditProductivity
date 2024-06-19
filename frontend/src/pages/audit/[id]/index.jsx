@@ -253,9 +253,7 @@ const StartAudit = () => {
 									onChange={(el) => setFormData({ ...formData, status: el.target.value })}
 									//
 								>
-									<option value={'in progress'} selected>
-										In progress
-									</option>
+									<option value={'in progress'}>In progress</option>
 									<option value={'completed'}>Completed</option>
 								</select>
 							</div>

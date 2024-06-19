@@ -4,9 +4,10 @@ const { FaPlus } = require('react-icons/fa');
 
 const AuditQuestionBox = ({ id, question, handleInputChange, responses, setFileModal, view }) => {
 	const response = responses.find((res) => res.questionId === question.id);
-	const fileData = typeof response.files === 'string' ? JSON.parse(response.files) : response.files;
-	// console.log(response.answer, fileData);
+	const fileData = typeof response?.files === 'string' ? JSON.parse(response?.files) : response?.files;
+	const optionsData = typeof question?.options === 'string' ? JSON.parse(question.options) : question.options;
 
+	// console.log(response.answer, fileData);
 	const showFileModal = () => {
 		console.log(response);
 		setFileModal({ open: true, data: response });
@@ -21,22 +22,25 @@ const AuditQuestionBox = ({ id, question, handleInputChange, responses, setFileM
 
 			{question.type === 'multi_choice' && (
 				<div className='mb-6'>
-					{Object.entries(JSON.parse(question.options)).map(([key, value], index) => (
-						<div key={index} className='flex items-center mb-4'>
-							<input
-								type='radio'
-								id={'key' + key}
-								name={'options_' + question.id}
-								className='w-4 h-4 border-gray-300 focus:ring-0 !ring-white'
-								checked={response.optionAnswer === key}
-								onChange={() => handleInputChange(question.id, 'optionAnswer', key)}
-								disabled={view}
-							/>
-							<label htmlFor={'key' + key} className='block ms-2 text-sm font-normal'>
-								{value}
-							</label>
-						</div>
-					))}
+					{Object.entries(optionsData).map(([key, value], index) => {
+						const uniqueKey = `option_${question.id}_${key}`;
+						return (
+							<div key={index} className='flex items-center mb-4'>
+								<input
+									type='radio'
+									id={uniqueKey}
+									name={'options_' + question.id}
+									className='w-4 h-4 border-gray-300 focus:ring-0 !ring-white'
+									checked={response?.optionAnswer === key}
+									onChange={() => handleInputChange(question.id, 'optionAnswer', key)}
+									disabled={view}
+								/>
+								<label htmlFor={uniqueKey} className='block ms-2 text-sm font-normal'>
+									{value}
+								</label>
+							</div>
+						);
+					})}
 				</div>
 			)}
 
@@ -44,7 +48,7 @@ const AuditQuestionBox = ({ id, question, handleInputChange, responses, setFileM
 				<div className='w-full mb-[-5px]'>
 					<FloatField
 						label='Enter Comment'
-						value={response.answer}
+						value={response?.answer || ''}
 						onChange={(e) => handleInputChange(question.id, 'answer', e.target.value)}
 						disabled={view}
 					/>
@@ -55,7 +59,7 @@ const AuditQuestionBox = ({ id, question, handleInputChange, responses, setFileM
 						id={'skip_' + question.id}
 						type='checkbox'
 						className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:!ring-white'
-						checked={response.skip}
+						checked={response?.skip}
 						onChange={(e) => handleInputChange(question.id, 'skip', e.target.checked)}
 						disabled={view}
 					/>
@@ -71,7 +75,7 @@ const AuditQuestionBox = ({ id, question, handleInputChange, responses, setFileM
 						className='text-nowrap [&>span]:items-center !ring-gray-200'
 						onClick={showFileModal}>
 						<FaPlus className='mr-2 text-[16px]' />
-						File <span className='pl-2 ml-2 border-l'>{fileData.length || 0}</span>
+						File <span className='pl-2 ml-2 border-l'>{fileData?.length || 0}</span>
 					</Button>
 				</div>
 			</div>

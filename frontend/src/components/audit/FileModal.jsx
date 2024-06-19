@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 
 export const FileModal = ({ openModal, setOpenModal, handleInputChange, view }) => {
 	const data = openModal.data;
-	const fileData = typeof data.files === 'string' ? JSON.parse(data.files) : data.files;
+	const fileData = typeof data?.files === 'string' ? JSON.parse(data?.files) : data?.files;
 	const [files, setFiles] = useState(fileData || []);
 	const [newFile, setNewFile] = useState({ id: '', desc: '', url: '' });
 
@@ -63,7 +63,9 @@ export const FileModal = ({ openModal, setOpenModal, handleInputChange, view }) 
 									</Link>
 
 									{!view && (
-										<div className='btn_primary !py-[8px] cursor-pointer' onClick={() => removeFile(file.id)}>
+										<div
+											className='btn_primary !py-[8px] w-fit cursor-pointer'
+											onClick={() => removeFile(file.id)}>
 											<RiDeleteBin4Fill className='text-[18px] text-red-400' />
 										</div>
 									)}
@@ -72,8 +74,8 @@ export const FileModal = ({ openModal, setOpenModal, handleInputChange, view }) 
 						</div>
 
 						{!view && (
-							<div className='addNew _flex gap-x-3'>
-								<div className='w-full mb-[-6px]'>
+							<div className='addNew md:flex gap-x-3'>
+								<div className='w-full mb-3 md:mb-[-6px]'>
 									<FloatField
 										label={'File Description'}
 										value={newFile?.desc || ''}
@@ -81,9 +83,11 @@ export const FileModal = ({ openModal, setOpenModal, handleInputChange, view }) 
 									/>
 								</div>
 
-								<UploadWidget file={newFile} setFile={setNewFile} />
+								<div className='w-fit inline-block mr-2'>
+									<UploadWidget file={newFile} setFile={setNewFile} />
+								</div>
 
-								<button className='btn_primary !py-2.5 !px-4 w-36' onClick={action}>
+								<button className='btn_primary h-[42px] !px-4 w-36' onClick={action}>
 									Add File
 								</button>
 							</div>

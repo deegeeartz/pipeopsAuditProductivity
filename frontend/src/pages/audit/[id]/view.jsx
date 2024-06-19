@@ -228,9 +228,7 @@ const ViewAudit = () => {
 									disabled
 									//
 								>
-									<option value={'in progress'} selected>
-										In progress
-									</option>
+									<option value={'in progress'}>In progress</option>
 									<option value={'completed'}>Completed</option>
 								</select>
 							</div>

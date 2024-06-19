@@ -44,9 +44,23 @@ const EditAudit = () => {
 				}
 
 				setFormData(data.result);
-				setResponses(data.result.responses);
 				setSurvey(data.result.survey);
 				setCategories(data.result.categories);
+
+				const defaultResponses = data.result.survey.questions.map((ques) => {
+					const existingResponse = data.result.responses.find((response) => response.questionId === ques.id);
+					return existingResponse
+						? existingResponse
+						: {
+								questionId: ques.id,
+								answer: '',
+								optionAnswer: '',
+								files: [],
+								skip: false,
+						  };
+				});
+
+				setResponses(defaultResponses);
 			}
 		} catch (error) {
 			errorHandler(error);
@@ -71,6 +85,9 @@ const EditAudit = () => {
 
 	const nextStep = () => {
 		console.log('audit: ', formData);
+		console.log('questions: ', survey.questions);
+		console.log('responses: ', responses);
+
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 		step == 1 ? setStep(2) : setStep(1);
 	};
@@ -254,9 +271,7 @@ const EditAudit = () => {
 									onChange={(el) => setFormData({ ...formData, status: el.target.value })}
 									//
 								>
-									<option value={'in progress'} selected>
-										In progress
-									</option>
+									<option value={'in progress'}>In progress</option>
 									<option value={'completed'}>Completed</option>
 								</select>
 							</div>
