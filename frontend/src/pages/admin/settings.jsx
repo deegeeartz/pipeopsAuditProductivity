@@ -1,9 +1,9 @@
 import { CategoryModal } from '@/components/CategoryModal';
 import DeleteModal from '@/components/DeleteModal';
-import Layout from '@/components/Layout';
+import Layout from '@/components/layout/DashboardLayout';
 import { Loader } from '@/components/Loader';
 import http from '@/config/axios';
-import { errorHandler } from '@/services/errorHandler';
+import { errorHandler } from '@/utils/errorHandler';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -23,7 +23,7 @@ const Settings = () => {
 		const fetchData = async () => {
 			try {
 				const res = await http.get('/category');
-				if (res?.statusText == 'OK') {
+				if (res?.status == 200) {
 					console.log(res.data);
 					setData(res.data.result);
 				}
@@ -86,7 +86,7 @@ const Settings = () => {
 		const keyword = watch('search');
 		try {
 			const res = await http.get(`/category?search=${keyword}`);
-			if (res?.statusText == 'OK') {
+			if (res?.status == 200) {
 				setData(res.data.result);
 			}
 		} catch (error) {
@@ -99,7 +99,7 @@ const Settings = () => {
 		try {
 			const { id } = openDelModal.category;
 			const res = await http.delete('/category/' + id);
-			if (res?.statusText == 'OK') {
+			if (res?.status == 200) {
 				setData(res.data.result);
 				toast.success(res.data.message);
 			}
@@ -118,7 +118,7 @@ const Settings = () => {
 				res = await http.put('/category/' + id, { title });
 			}
 
-			if (res?.statusText == 'OK') {
+			if (res?.status == 200) {
 				setOpenModal({ open: false });
 				setData(res.data.result);
 				toast.success(res.data.message);

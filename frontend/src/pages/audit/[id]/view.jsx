@@ -14,12 +14,14 @@ import AuditQuestionBox from '@/components/audit/AuditQuestionBox';
 import SummaryTextField from '@/components/audit/SummaryTextField';
 import { FileModal } from '@/components/audit/FileModal';
 import Script from 'next/script';
+import { getUser } from '@/utils/auth';
 
-const StartAudit = () => {
+const ViewAudit = () => {
 	const router = useRouter();
-	const { id: surveyId } = router.query;
+	const { id: auditId } = router.query;
 	const [step, setStep] = useState(1);
 	const [formData, setFormData] = useState({});
+	const [audit, setAudit] = useState({});
 	const [categories, setCategories] = useState([]);
 	const [responses, setResponses] = useState([]);
 	const [isLoading, setLoading] = useState(true);
@@ -27,22 +29,15 @@ const StartAudit = () => {
 
 	const fetchData = async () => {
 		try {
-			const survey = await http.get('/survey/' + surveyId);
+			const res = await http.get('/audit/' + auditId);
 
-			if (survey?.status == 200) {
-				console.log(survey.data.result);
+			if (res?.status == 200) {
+				console.log(res.data.result);
 
-				setFormData(survey.data.result);
-				setCategories(survey.data.result.categories);
-				setResponses(
-					survey.data.result.questions.map((ques) => ({
-						questionId: ques.id,
-						answer: '',
-						optionAnswer: '',
-						files: [],
-						skip: false,
-					}))
-				);
+				setAudit(res.data.result);
+				setResponses(res.data.result.responses);
+				setFormData(res.data.result.survey);
+				setCategories(res.data.result.categories);
 			}
 		} catch (error) {
 			errorHandler(error);
@@ -52,10 +47,10 @@ const StartAudit = () => {
 	};
 
 	useEffect(() => {
-		if (surveyId) {
+		if (auditId) {
 			fetchData();
 		}
-	}, [surveyId]);
+	}, [auditId]);
 
 	if (isLoading) {
 		return (
@@ -85,7 +80,7 @@ const StartAudit = () => {
 			detailedSummary: formData?.detailedSummary,
 			Scenario: formData?.Scenario,
 			status: formData?.status || 'in progress',
-			surveyId,
+			auditId,
 			responses,
 		};
 
@@ -108,12 +103,12 @@ const StartAudit = () => {
 
 			<div className='content p-6'>
 				<div className='mb-7 flex justify-between items-center'>
-					<h1 className='font-bold text-lg text-[#222]'>Survey #{surveyId}</h1>
+					<h1 className='font-bold text-lg text-[#222]'>Audit #{auditId}</h1>
 
-					<Link href='/inspector/surveys' className='btn_primary _flex'>
+					{/* <Link href='/inspector/surveys' className='btn_primary _flex'>
 						<RiArrowLeftLine className='mr-2 h-5 w-5' />
 						<span className='hidden md:block'>All Surveys</span>
-					</Link>
+					</Link> */}
 				</div>
 
 				<div className='py-7 px-5 mb-8 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
@@ -160,7 +155,7 @@ const StartAudit = () => {
 							<h3 className='heading text-xl font-semibold pt-4 mb-8 uppercase'>Questionnaire</h3>
 
 							{!formData?.questions?.length ? (
-								<p className='text-gray-400 mb-4'>No questions added!</p>
+								<p className='text-gray-400 mb-4'>No questions found!</p>
 							) : (
 								<div className='mb-5'>
 									<Accordion>
@@ -190,46 +185,31 @@ const StartAudit = () => {
 							<Accordion>
 								<Accordion.Panel className='box'>
 									<CategoryPanel title={'Brand Standard'}>
-										<SummaryTextField
-											value={formData?.brandStandard ?? ''}
-											onChange={(el) => setFormData({ ...formData, brandStandard: el.target.value })}
-										/>
+										<SummaryTextField value={audit?.brandStandard ?? ''} readOnly />
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
 									<CategoryPanel title={'Executive Summary'}>
-										<SummaryTextField
-											value={formData?.executiveSummary ?? ''}
-											onChange={(el) => setFormData({ ...formData, executiveSummary: el.target.value })}
-										/>
+										<SummaryTextField value={audit?.executiveSummary ?? ''} readOnly />
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
 									<CategoryPanel title={'Detailed Summary'}>
-										<SummaryTextField
-											value={formData?.detailedSummary ?? ''}
-											onChange={(el) => setFormData({ ...formData, detailedSummary: el.target.value })}
-										/>
+										<SummaryTextField value={audit?.detailedSummary ?? ''} readOnly />
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
 									<CategoryPanel title={'Scenario'}>
-										<SummaryTextField
-											value={formData?.Scenario ?? ''}
-											onChange={(el) => setFormData({ ...formData, Scenario: el.target.value })}
-										/>
+										<SummaryTextField value={audit?.Scenario ?? ''} readOnly />
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
 									<CategoryPanel title={'Expense'}>
-										<SummaryTextField
-											value={formData?.expense ?? ''}
-											onChange={(el) => setFormData({ ...formData, expense: el.target.value })}
-										/>
+										<SummaryTextField value={audit?.expense ?? ''} readOnly />
 									</CategoryPanel>
 								</Accordion.Panel>
 							</Accordion>
@@ -239,8 +219,9 @@ const StartAudit = () => {
 
 								<select
 									className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-white focus:border-[#252525] block w-full p-2.5 '
-									value={formData.status || ''}
-									onChange={(el) => setFormData({ ...formData, status: el.target.value })}
+									value={audit.status || ''}
+									readOnly
+									disabled
 									//
 								>
 									<option value={'in progress'} selected>
@@ -256,10 +237,10 @@ const StartAudit = () => {
 								{step == 1 ? 'Next' : 'Previous'}
 							</button>
 
-							{step == 2 && (
-								<button type='submit' className='btn_primary _flex !px-[10px] !py-[10px] md:!px-[30px]'>
+							{getUser().role == 'CLIENT' && (
+								<button type='submit' className='btn_primary _flex !px-[5px] !py-[10px] md:!px-[30px]'>
 									<RiAddFill size={22} className='mr-1.5' />
-									<span>Create Audit</span>
+									<span>Submit Feedback</span>
 								</button>
 							)}
 						</div>
@@ -274,4 +255,4 @@ const StartAudit = () => {
 	);
 };
 
-export default StartAudit;
+export default ViewAudit;

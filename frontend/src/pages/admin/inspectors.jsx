@@ -1,9 +1,9 @@
 import DeleteModal from '@/components/DeleteModal';
-import Layout from '@/components/Layout';
+import Layout from '@/components/layout/DashboardLayout';
 import { Loader } from '@/components/Loader';
 import SearchBox from '@/components/SearchBox';
 import http from '@/config/axios';
-import { errorHandler } from '@/services/errorHandler';
+import { errorHandler } from '@/utils/errorHandler';
 import { Label, Modal, TextInput } from 'flowbite-react';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
@@ -23,7 +23,7 @@ const Inspectors = () => {
 	const fetchData = async () => {
 		try {
 			const res = await http.get('/inspector');
-			if (res?.statusText == 'OK') {
+			if (res?.status == 200) {
 				console.log('fetchData:', res.data);
 				setData(res.data.result);
 			}
@@ -180,7 +180,7 @@ const Inspectors = () => {
 		try {
 			const id = openDelModal.data.id;
 			const res = await http.delete('/inspector/' + id);
-			if (res?.statusText == 'OK') {
+			if (res?.status == 200) {
 				fetchData();
 				toast.success(res.data.message);
 			}

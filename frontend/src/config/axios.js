@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { getToken, logOutUser } from '../services/auth';
+import { getToken, logOutUser } from '../utils/auth';
 import { toast } from 'react-toastify';
 
 // axios config for server
-export const API_URL = 'http://localhost:8080/api';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
 const http = axios.create({
 	baseURL: API_URL,

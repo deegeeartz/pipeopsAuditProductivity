@@ -13,7 +13,7 @@ import {
 } from 'react-icons/ri';
 import { FaUserCircle } from 'react-icons/fa';
 import { Dropdown } from 'flowbite-react';
-import { authMiddleware, userIsLoggedIn, logOutUser } from '@/services/auth';
+import { authMiddleware, userIsLoggedIn, logOutUser } from '@/utils/auth';
 
 const Layout = ({ children }) => {
 	const router = useRouter();

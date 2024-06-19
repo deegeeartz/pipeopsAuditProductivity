@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Layout from '@/components/Layout';
+import Layout from '@/components/layout/DashboardLayout';
 import {
 	RiAddFill,
 	RiArrowLeftLine,
@@ -176,7 +176,7 @@ const EditSurvey = () => {
 							<p className='heading text-base font-medium mb-7'>Questions ({questions.length})</p>
 
 							{!questions.length ? (
-								<p className='text-red-500 mb-4'>No questions added!</p>
+								<p className='text-gray-400 mb-4'>No questions added!</p>
 							) : (
 								<div className='mb-5'>
 									<Accordion>

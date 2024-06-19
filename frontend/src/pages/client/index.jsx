@@ -12,7 +12,7 @@ import { errorHandler } from '@/utils/errorHandler';
 
 const DataTableX = dynamic(() => import('@/components/DataTableX'), { ssr: false, loading: Loader });
 
-const InspectorAudits = () => {
+const ClientAudits = () => {
 	const [openDelModal, setOpenDelModal] = useState({ open: false, data: null });
 	const [data, setData] = useState([]);
 	const [searchTerm, setSearchTerm] = useState('');
@@ -116,7 +116,7 @@ const InspectorAudits = () => {
 			'text-[17px] cursor-pointer rounded-sm p-1 text-[#252525] border border-gray-300 hover:bg-gray-200 fx_center';
 		return (
 			<div className='flex gap-x-4'>
-				<Link href={`audit/${id}/view`} className={`${style}`}>
+				<Link href={`audit/${id}/edit`} className={`${style}`}>
 					<RiEyeFill />
 				</Link>
 
@@ -191,4 +191,4 @@ const InspectorAudits = () => {
 	);
 };
 
-export default InspectorAudits;
+export default ClientAudits;

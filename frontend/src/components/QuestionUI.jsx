@@ -7,9 +7,11 @@ export const CategoryPanel = ({ title, count, children }) => {
 			<Accordion.Title className='!ring-opacity-0 py-4 hover:!bg-gray-50 focus:!bg-gray-50'>
 				<div className='capitalize fx_between'>
 					<h5 className='text-sm'>{title}</h5>
-					<Badge color='failure' className='px-4 ml-2'>
-						{count}
-					</Badge>
+					{count && (
+						<Badge color='failure' className='px-4 ml-2'>
+							{count}
+						</Badge>
+					)}
 				</div>
 			</Accordion.Title>
 

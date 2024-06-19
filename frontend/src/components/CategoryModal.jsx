@@ -1,5 +1,5 @@
 import http from '@/config/axios';
-import { errorHandler } from '@/services/errorHandler';
+import { errorHandler } from '@/utils/errorHandler';
 import { Label, Modal, TextInput } from 'flowbite-react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';

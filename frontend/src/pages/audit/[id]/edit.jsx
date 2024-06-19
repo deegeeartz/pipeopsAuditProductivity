@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Layout from '@/components/Layout';
+import Layout from '@/components/layout/DashboardLayout';
 import {
 	RiAddFill,
 	RiArrowLeftLine,
@@ -69,7 +69,7 @@ const EditAudit = () => {
 	const [category, setCategory] = useState(categoryDemo);
 	const [formData, setFormData] = useState({
 		client: 'KM Hotels',
-		brand: 'GSmith Hostel ',
+		hotelName: 'GSmith Hostel ',
 		campaign: '2st round 2024',
 		location: '13 James Street, Lagos',
 		start_date: '2024-05-06',
@@ -111,7 +111,7 @@ const EditAudit = () => {
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Brand'} value={formData.brand ?? ''} readOnly />
+								<FloatField label={'Hotel Name'} value={formData.hotelName ?? ''} readOnly />
 							</div>
 
 							<div className='mb-5'>
@@ -144,7 +144,7 @@ const EditAudit = () => {
 							<h3 className='heading text-xl font-semibold pt-4 mb-8 uppercase'>Questionnaire</h3>
 
 							{!questions.length ? (
-								<p className='text-red-500 mb-4'>No questions added!</p>
+								<p className='text-gray-400 mb-4'>No questions added!</p>
 							) : (
 								<div className='mb-5'>
 									<Accordion>

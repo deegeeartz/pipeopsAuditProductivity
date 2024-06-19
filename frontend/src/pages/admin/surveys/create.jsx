@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Layout from '@/components/Layout';
+import Layout from '@/components/layout/DashboardLayout';
 import { RiAddFill, RiArrowLeftLine, RiCheckboxBlankCircleLine, RiCloseLine } from 'react-icons/ri';
 
 import Link from 'next/link';
@@ -9,7 +9,7 @@ import { CategoryPanel, QuestionBox } from '@/components/QuestionUI';
 import { toast } from 'react-toastify';
 import { CategoryModal } from '@/components/CategoryModal';
 import { Loader } from '@/components/Loader';
-import { errorHandler } from '@/services/errorHandler';
+import { errorHandler } from '@/utils/errorHandler';
 import http from '@/config/axios';
 import { useRouter } from 'next/router';
 
@@ -209,7 +209,7 @@ const CreateSurvey = () => {
 							<p className='heading text-base font-medium mb-7'>Questions ({questions.length})</p>
 
 							{!questions.length ? (
-								<p className='text-red-500 mb-4'>No questions added!</p>
+								<p className='text-gray-400 mb-4'>No questions added!</p>
 							) : (
 								<div className='mb-5'>
 									<Accordion>

@@ -62,13 +62,13 @@ const SurveyTable = ({ data, setOpenDelModal, setEntryModal }) => {
 			minWidth: '110px',
 		},
 		{
-			name: 'Status',
+			name: 'Audits',
 			minWidth: '120px',
 			cell: (row) => {
-				const count = row?._count?.questions;
+				const count = row?._count?.audits;
 				return (
 					<Badge
-						color={count > 0 ? 'success' : 'gray'}
+						color={count > 0 ? 'success' : 'failure'}
 						onClick={() => setEntryModal(true)}
 						className='cursor-pointer'>
 						{count}

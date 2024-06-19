@@ -1,4 +1,4 @@
-import GuestLayout from '@/components/GuestLayout';
+import GuestLayout from '@/components/layout/GuestLayout';
 import { API_URL } from '@/config/axios';
 import axios from 'axios';
 import { useRouter } from 'next/router';

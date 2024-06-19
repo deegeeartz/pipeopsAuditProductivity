@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 import DeleteModal from '@/components/DeleteModal';
-import Layout from '@/components/Layout';
+import Layout from '@/components/layout/DashboardLayout';
 import { Loader } from '@/components/Loader';
 import dynamic from 'next/dynamic';
 import { RiAddFill } from 'react-icons/ri';
 import Link from 'next/link';
 import { Modal } from 'flowbite-react';
 import http from '@/config/axios';
-import { errorHandler } from '@/services/errorHandler';
+import { errorHandler } from '@/utils/errorHandler';
 import SearchBox from '@/components/SearchBox';
 import { toast } from 'react-toastify';
 
-const SurveyTable = dynamic(() => import('@/components/SurveyTable'), { ssr: false, loading: Loader });
+const SurveyTable = dynamic(() => import('@/components/survey/SurveyTable'), { ssr: false, loading: Loader });
 
 const Surveys = () => {
 	const [openDelModal, setOpenDelModal] = useState({ open: false, data: null });
@@ -23,7 +23,7 @@ const Surveys = () => {
 	const fetchData = async () => {
 		try {
 			const res = await http.get('/survey');
-			if (res?.statusText == 'OK') {
+			if (res?.status == 200) {
 				console.log(res.data);
 				setData(res.data.result);
 			}
@@ -68,7 +68,7 @@ const Surveys = () => {
 		try {
 			const id = openDelModal?.id;
 			const res = await http.delete('/survey/' + id);
-			if (res?.statusText == 'OK') {
+			if (res?.status == 200) {
 				fetchData();
 				toast.success(res.data.message);
 			}
