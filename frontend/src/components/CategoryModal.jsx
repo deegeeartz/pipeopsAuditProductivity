@@ -1,13 +1,37 @@
+import http from '@/config/axios';
+import { errorHandler } from '@/services/errorHandler';
 import { Label, Modal, TextInput } from 'flowbite-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
 
-export function CategoryModal({ openModal, setOpenModal, createOrUpdateRecord }) {
+export function CategoryModal({ openModal, setOpenModal, createOrUpdateRecord, setCategories }) {
 	const [category, setCategory] = useState(openModal.category);
 	const isEdit = openModal.type === 'edit';
 
+	const createRecord = async (category) => {
+		try {
+			const res = await http.post('/category', { title: category.title });
+			if (res?.status == 200) {
+				setOpenModal({ open: false });
+				setCategories(res.data.result);
+				toast.success(res.data.message);
+			}
+		} catch (error) {
+			errorHandler(error);
+		}
+	};
+
 	const action = () => {
-		createOrUpdateRecord(category);
-		setOpenModal({ open: false });
+		if (!category?.title.trim()) {
+			toast.error('Category field is required!');
+			return;
+		}
+
+		if (createOrUpdateRecord) {
+			createOrUpdateRecord(category);
+		} else {
+			createRecord(category);
+		}
 	};
 
 	return (

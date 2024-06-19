@@ -23,7 +23,7 @@ export const QuestionBox = ({ id, question, removeQuestion }) => {
 		<div className='box fx_between py-3 px-3 mb-4 border border-gray-200 shadow-sm rounded-md'>
 			<div className='md:_flex'>
 				<i className='text-[12px] font-semibold pr-3'>#{id}</i>
-				<span className='text-[13px] font-medium'>{question.title}</span>
+				<span className='text-[13px] font-medium'>{question.text}</span>
 
 				{question.type === 'multi_choice' && (
 					<div className=' mt-3'>

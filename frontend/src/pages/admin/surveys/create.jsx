@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Layout from '@/components/Layout';
 import { RiAddFill, RiArrowLeftLine, RiCheckboxBlankCircleLine, RiCloseLine } from 'react-icons/ri';
 
@@ -8,53 +8,104 @@ import { FloatField, InputFieldStatic, SelectField } from '@/components/Fields';
 import { CategoryPanel, QuestionBox } from '@/components/QuestionUI';
 import { toast } from 'react-toastify';
 import { CategoryModal } from '@/components/CategoryModal';
-
-const categoryDemo = [
-	{ id: 1, text: 'Arrival and check in - General' },
-	{ id: 2, text: 'Arrival and check in - Reception' },
-	{ id: 3, text: 'Check out and departure - General' },
-	{ id: 4, text: 'Check out and departure - Reception' },
-];
-
-const questionsDemo = [
-	// {
-	// 	id: '82Q_1713821351111',
-	// 	type: 'text',
-	// 	title: 'How was your experience at the hotel?',
-	// 	categoryId: '1',
-	// 	options: {},
-	// },
-	// {
-	// 	id: '64Q_1713821353243',
-	// 	type: 'multi_choice',
-	// 	title: 'How was your experience at the hotel?',
-	// 	categoryId: '1',
-	// 	options: {
-	// 		1: 'Very Satisfied',
-	// 		2: 'Satisfied',
-	// 		3: 'Bad',
-	// 		4: 'Very Bad',
-	// 	},
-	// },
-];
+import { Loader } from '@/components/Loader';
+import { errorHandler } from '@/services/errorHandler';
+import http from '@/config/axios';
+import { useRouter } from 'next/router';
 
 const CreateSurvey = () => {
-	// const [openDelModal, setOpenDelModal] = useState(false);
-	const [openCatModal, setOpenCatModal] = useState({ open: false, type: 'create' });
+	const router = useRouter();
 	const [step, setStep] = useState(1);
-	const [category, setCategory] = useState(categoryDemo);
+	const [openCatModal, setOpenCatModal] = useState({ open: false });
+	const [CATEGORIES, setCategories] = useState([]);
+	const [CLIENTS, setClients] = useState([]);
 	const [formData, setFormData] = useState({});
-	const [questions, setQuestions] = useState(questionsDemo);
+	const [questions, setQuestions] = useState([]);
+	const [isLoading, setLoading] = useState(true);
+
+	const fetchCategory = async () => {
+		try {
+			const categories = await http.get('/category');
+			const clients = await http.get('/client/list');
+
+			if (categories?.status == 200 && clients?.status == 200) {
+				// console.log(categories.data.result, clients.data.result);
+				setCategories(categories.data.result);
+				setClients(clients.data.result);
+			}
+		} catch (error) {
+			errorHandler(error);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		fetchCategory();
+	}, []);
+
+	if (isLoading) {
+		return (
+			<div className='h-screen grid_center'>
+				<Loader />
+			</div>
+		);
+	}
+
+	const nextStep = () => {
+		console.log(formData);
+
+		const fieldValidation = () => {
+			if (!formData.clientId) {
+				toast.error('Client field is required');
+				return false;
+			}
+
+			// if (!formData.hotelName) {
+			// 	toast.error('Hotel Name is required');
+			// 	return false;
+			// }
+
+			return true;
+		};
+
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+		if (step == 1 && fieldValidation()) setStep(2);
+		// Go to previous step
+		step == 2 && setStep(1);
+	};
 
 	const removeQuestion = (id) => {
 		setQuestions(questions.filter((item) => item.id !== id));
 	};
 
-	const onFormSubmit = (el) => {
+	const onFormSubmit = async (el) => {
 		el.preventDefault();
 
-		console.log('questions', questions);
-		console.log('formData', formData);
+		const { name: clientName } = CLIENTS.filter((item) => item.id == formData?.clientId)[0].user;
+		const payload = {
+			hotelName: formData?.hotelName,
+			campaign: formData?.campaign,
+			location: formData?.location,
+			startDate: formData?.start_date,
+			endDate: formData?.end_date,
+			clientId: formData?.clientId,
+			clientName: clientName,
+			questions: questions.map((question) => ({ ...question, categoryId: parseInt(question.categoryId) })),
+		};
+
+		console.log('payload', payload);
+		// return console.log('payload', payload);
+
+		try {
+			const res = await http.post('/survey', payload);
+			if (res?.status == 201) {
+				toast.success(res.data.message);
+				router.push('/admin/surveys');
+			}
+		} catch (error) {
+			errorHandler(error);
+		}
 	};
 
 	return (
@@ -74,19 +125,26 @@ const CreateSurvey = () => {
 							<h3 className='heading text-xl font-semibold mb-8 uppercase'>Survey Details</h3>
 
 							<div className='mb-5'>
-								<SelectField label={'Client'}>
+								<SelectField
+									label={'Client'}
+									value={formData.clientId ?? ''}
+									onChange={(el) => setFormData({ ...formData, clientId: el.target.value })}>
 									<option>select client</option>
-									<option>KM Hotels</option>
-									<option>JEntertainment LTD</option>
-									<option></option>
+
+									{/* Display clients */}
+									{CLIENTS.map((item) => (
+										<option value={item.id} key={item.id}>
+											{item.user.name}
+										</option>
+									))}
 								</SelectField>
 							</div>
 
 							<div className='mb-5'>
 								<FloatField
-									label={'Brand'}
-									value={formData.brand ?? ''}
-									onChange={(el) => setFormData({ ...formData, brand: el.target.value })}
+									label={'Hotel Name'}
+									value={formData.hotelName ?? ''}
+									onChange={(el) => setFormData({ ...formData, hotelName: el.target.value })}
 								/>
 							</div>
 
@@ -112,7 +170,7 @@ const CreateSurvey = () => {
 									value={formData.start_date ?? ''}
 									onChange={(el) => setFormData({ ...formData, start_date: el.target.value })}
 									type='date'
-									onFocus={(el) => el.target.showPicker()}
+									onClick={(el) => el.target.showPicker()}
 								/>
 							</div>
 
@@ -122,7 +180,7 @@ const CreateSurvey = () => {
 									value={formData.end_date ?? ''}
 									onChange={(el) => setFormData({ ...formData, end_date: el.target.value })}
 									type='date'
-									onFocus={(el) => el.target.showPicker()}
+									onClick={(el) => el.target.showPicker()}
 								/>
 							</div>
 
@@ -145,7 +203,7 @@ const CreateSurvey = () => {
 								</div>
 							</div>
 
-							<AddQuestion category={category} setQuestions={setQuestions} />
+							<AddQuestion category={CATEGORIES} setQuestions={setQuestions} />
 
 							<div className='mt-8 mb-6 border border-gray-300' />
 							<p className='heading text-base font-medium mb-7'>Questions ({questions.length})</p>
@@ -155,18 +213,16 @@ const CreateSurvey = () => {
 							) : (
 								<div className='mb-5'>
 									<Accordion>
-										{category.map((item) => {
+										{CATEGORIES.filter((item) =>
+											questions.some((question) => question.categoryId === item.id.toString())
+										).map((item) => {
 											const categoryQuestions = questions.filter(
 												(question) => question.categoryId === item.id.toString()
 											);
 
-											if (categoryQuestions.length === 0) {
-												return <></>;
-											}
-
 											return (
 												<Accordion.Panel key={item.id} className='box'>
-													<CategoryPanel title={item.text} count={categoryQuestions.length}>
+													<CategoryPanel title={item.title} count={categoryQuestions.length}>
 														{categoryQuestions.map((question, index) => (
 															<QuestionBox
 																key={index}
@@ -185,13 +241,7 @@ const CreateSurvey = () => {
 						</div>
 
 						<div className='py-5 _flex'>
-							<button
-								type='button'
-								onClick={() => {
-									window.scrollTo({ top: 0, behavior: 'smooth' });
-									step == 1 ? setStep(2) : setStep(1);
-								}}
-								className='btn_primary !py-[10px] md:!px-[30px] mr-4'>
+							<button type='button' onClick={nextStep} className='btn_primary !py-[10px] md:!px-[30px] mr-4'>
 								{step == 1 ? 'Next' : 'Previous'}
 							</button>
 
@@ -206,13 +256,19 @@ const CreateSurvey = () => {
 				</div>
 			</div>
 
-			{openCatModal.open && <CategoryModal openModal={openCatModal} setOpenModal={setOpenCatModal} />}
+			{openCatModal.open && (
+				<CategoryModal
+					openModal={openCatModal}
+					setOpenModal={setOpenCatModal}
+					setCategories={setCategories}
+				/>
+			)}
 		</Layout>
 	);
 };
 
 const AddQuestion = ({ category, setQuestions }) => {
-	const [data, setData] = useState({ id: '', type: 'text', title: '', categoryId: '' });
+	const [data, setData] = useState({ id: '', type: 'text', text: '', categoryId: '' });
 	const [options, setOptions] = useState({});
 	const [optionFields, setOptionFields] = useState([1, 2]);
 
@@ -225,7 +281,6 @@ const AddQuestion = ({ category, setQuestions }) => {
 
 	const onChangeInput = (el, id) => {
 		setOptions({ ...options, [id]: el.target.value });
-		// console.log(el.target);
 	};
 
 	const removeOptionField = (id) => {
@@ -237,9 +292,10 @@ const AddQuestion = ({ category, setQuestions }) => {
 	const submitForm = (el) => {
 		el.preventDefault();
 		// Get valid options
-		const filteredOptions = Object.fromEntries(
-			Object.entries(options).filter(([key, value]) => value.trim() !== '')
-		);
+		const filteredOptions =
+			data.type == 'multi_choice'
+				? Object.fromEntries(Object.entries(options).filter(([key, value]) => value.trim() !== ''))
+				: {};
 
 		// Validation
 		if (!data.categoryId) {
@@ -250,7 +306,7 @@ const AddQuestion = ({ category, setQuestions }) => {
 			toast.error('Field Type is required!', {});
 			return;
 		}
-		if (!data.title) {
+		if (!data.text) {
 			toast.error('Question field is required!', {});
 			return;
 		}
@@ -259,12 +315,12 @@ const AddQuestion = ({ category, setQuestions }) => {
 			return;
 		}
 
-		// Generate ID
-		const id = Math.floor(Math.random() * 99) + 'Q_' + Date.now();
-		const questionData = { ...data, id, options: filteredOptions };
+		// Add question to state
+		const questionData = { ...data, id: Date.now(), options: filteredOptions };
 		setQuestions((prev) => [...prev, questionData]);
+
 		// Reset Data
-		setData({ type: 'text' });
+		setData({ ...data, text: '', type: 'text' });
 		console.log(questionData);
 
 		toast.success('Question added successfully!', {});
@@ -280,7 +336,7 @@ const AddQuestion = ({ category, setQuestions }) => {
 					<option value=''>select category</option>
 					{category.map((item, index) => (
 						<option key={index} value={item.id}>
-							{item.text}
+							{item.title}
 						</option>
 					))}
 				</SelectField>
@@ -300,8 +356,8 @@ const AddQuestion = ({ category, setQuestions }) => {
 				<div className='w-full mb-4 md:mb-0'>
 					<FloatField
 						label={'Enter Question'}
-						value={data.title ?? ''}
-						onChange={(el) => setData({ ...data, title: el.target.value })}
+						value={data.text ?? ''}
+						onChange={(el) => setData({ ...data, text: el.target.value })}
 					/>
 				</div>
 

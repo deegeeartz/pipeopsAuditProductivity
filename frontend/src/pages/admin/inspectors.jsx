@@ -1,6 +1,7 @@
 import DeleteModal from '@/components/DeleteModal';
 import Layout from '@/components/Layout';
 import { Loader } from '@/components/Loader';
+import SearchBox from '@/components/SearchBox';
 import http from '@/config/axios';
 import { errorHandler } from '@/services/errorHandler';
 import { Label, Modal, TextInput } from 'flowbite-react';
@@ -131,10 +132,15 @@ const Inspectors = () => {
 	const searchRecord = async (keyword) => {
 		setSearchTerm(keyword);
 		try {
-			const res = await http.get(`/inspector?search=${keyword}`);
-			if (res?.status == 200) {
-				setData(res.data.result);
+			// Limit the length of the search term to reduce api calls
+			if (keyword.length > 2) {
+				const res = await http.get(`/inspector?search=${keyword}`);
+				if (res?.status == 200) {
+					setData(res.data.result);
+				}
 			}
+			// Re-fetch table data if empty
+			keyword.length == 0 && fetchData();
 		} catch (error) {
 			setData([]);
 			errorHandler(error);
@@ -162,6 +168,7 @@ const Inspectors = () => {
 
 			if ([200, 201].includes(res?.status)) {
 				fetchData();
+				setOpenModal({ open: false });
 				toast.success(res.data.message);
 			}
 		} catch (error) {
@@ -197,20 +204,7 @@ const Inspectors = () => {
 					<div className='tableHeader py-2 px-4 flex justify-between items-center'>
 						<p className='text-[13px] font-semibold'>Total ({data.length})</p>
 
-						<div className='searchBox min-w-[40%]'>
-							<div className='relative w-full'>
-								<div className='absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none'>
-									<RiSearch2Line color='#b2b6bc' />
-								</div>
-								<input
-									type='text'
-									className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full ps-10 px-3 py-[8px] focus:border-1 focus:border-[#252525] focus:ring-white'
-									placeholder='Search...'
-									value={searchTerm}
-									onChange={(e) => searchRecord(e.target.value)}
-								/>
-							</div>
-						</div>
+						<SearchBox searchTerm={searchTerm} searchRecord={searchRecord} />
 					</div>
 
 					<DataTableX data={data} columns={columns} />
@@ -247,7 +241,6 @@ function InspectorModal({ openModal, setOpenModal, createOrUpdateRecord }) {
 
 	const action = (data) => {
 		createOrUpdateRecord(data);
-		setOpenModal({ open: false });
 	};
 
 	return (

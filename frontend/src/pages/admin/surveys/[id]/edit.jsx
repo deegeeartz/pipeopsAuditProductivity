@@ -109,9 +109,9 @@ const EditSurvey = () => {
 
 							<div className='mb-5'>
 								<FloatField
-									label={'Brand'}
-									value={formData.brand ?? ''}
-									onChange={(el) => setFormData({ ...formData, brand: el.target.value })}
+									label={'Hotel Name'}
+									value={formData.hotelName ?? ''}
+									onChange={(el) => setFormData({ ...formData, hotelName: el.target.value })}
 								/>
 							</div>
 

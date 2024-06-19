@@ -109,7 +109,6 @@ const Settings = () => {
 	};
 
 	const createOrUpdateRecord = async (category) => {
-		console.log(category);
 		try {
 			let res;
 			const { id, title } = category;
@@ -120,7 +119,7 @@ const Settings = () => {
 			}
 
 			if (res?.statusText == 'OK') {
-				console.log(res.data);
+				setOpenModal({ open: false });
 				setData(res.data.result);
 				toast.success(res.data.message);
 			}
