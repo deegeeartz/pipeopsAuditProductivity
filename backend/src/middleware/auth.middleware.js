@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 exports.auth = async (req, res, next) => {
 	const authorization = req.headers.authorization;
-	if (!authorization) return res.status(401).json({ error: 'No Authorization Header!' });
+	if (!authorization) return res.status(401).json({ error: 'Unauthorized request!' });
 	try {
 		const token = authorization.split('Bearer ')[1];
 		if (!token) return res.status(401).json({ error: 'Unauthorized request!' });
@@ -27,5 +27,5 @@ exports.onlyAdmin = async (req, res, next) => {
 	if (req.user.role === 'ADMIN') {
 		next();
 	}
-	return res.status(403).send('Unauthorized access. Admins only!');
+	return res.status(403).json({ error: 'Unauthorized access!' });
 };
