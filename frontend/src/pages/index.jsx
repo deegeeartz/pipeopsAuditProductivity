@@ -1,19 +1,26 @@
 import GuestLayout from '@/components/layout/GuestLayout';
 import { useAuth } from '@/context/AuthProvider';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { LoaderOverlay } from '../components/common/LoaderOverlay';
 
 export default function Login() {
 	const { register, handleSubmit } = useForm();
 	const { login } = useAuth();
+	const [loadingRequest, setLoadingRequest] = useState(false);
 
 	const onFormSubmit = async (data) => {
-		console.log('data: ', data);
+		setLoadingRequest(true);
+		// Login user
 		const { email, password } = data;
 		await login(email, password);
+		setLoadingRequest(false);
 	};
 
 	return (
 		<GuestLayout>
+			{loadingRequest && <LoaderOverlay />}
+
 			<div className='flex min-h-full flex-col justify-center p-5 pt-2 pb-8 lg:px-8'>
 				<div className='sm:mx-auto sm:w-full sm:max-w-sm'>
 					<img src='/logo-xl.png' alt='Logo' className='w-[150px] mx-auto' />
