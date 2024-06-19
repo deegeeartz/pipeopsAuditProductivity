@@ -36,3 +36,10 @@ exports.inspectorOnly = async (req, res, next) => {
 	}
 	return res.status(403).json({ error: 'Unauthorized access. Inspector Only!' });
 };
+
+exports.clientOnly = (req, res, next) => {
+	if (req.user.role !== 'CLIENT') {
+		return res.status(403).json({ error: 'Access denied. Only clients can perform this action.' });
+	}
+	next();
+};

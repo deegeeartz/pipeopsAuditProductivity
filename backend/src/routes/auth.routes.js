@@ -20,8 +20,11 @@ router.post('/login', async (req, res) => {
 		if (error) return res.status(400).json({ error: error.details[0].message });
 		const { email, password } = value;
 
+		const user = await prisma.user.findUnique({
+			where: { email },
+			include: { client: true, inspector: true },
+		});
 		// Verify the password
-		const user = await prisma.user.findUnique({ where: { email } });
 		const passwordMatch = await verifyPassword(password, user?.password ?? '');
 		if (!passwordMatch) return res.status(401).json({ error: 'Invalid email or password!' });
 
@@ -42,7 +45,7 @@ router.get('/setup', async (req, res) => {
 		if (existingUser) return res.status(403).json({ error: 'Admin has already been created!' });
 
 		// Create record
-		const hashPassword = await bcrypt.hash('admin24', 10);
+		const hashPassword = await bcrypt.hash('@admin234bespoke', 10);
 		await prisma.user.create({
 			data: {
 				name: 'Super Admin',

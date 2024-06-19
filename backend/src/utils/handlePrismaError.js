@@ -31,7 +31,7 @@ const handlePrismaError = (error) => {
 				return {
 					status: 400,
 					response: {
-						error: `Failed to delete due to related records. Remove records and try again.`,
+						error: `Request failed due to conflict with related records. Remove records and try again.`,
 						errorObject: error,
 					},
 				};

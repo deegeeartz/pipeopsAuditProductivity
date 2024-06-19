@@ -14,7 +14,6 @@ COPY . .
 RUN npm install
 
 RUN npx prisma generate
-RUN npx prisma migrate deploy
 
 # Installing pm2 globally
 RUN npm install pm2 -g

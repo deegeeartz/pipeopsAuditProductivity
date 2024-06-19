@@ -12,7 +12,6 @@ const schema = Joi.object({
 	executiveSummary: Joi.string().allow(''),
 	scenario: Joi.string().allow(''),
 	status: Joi.string().allow(''),
-	feedback: Joi.string().allow(''),
 	responses: Joi.array(),
 	surveyId: Joi.number().required(),
 	// inspectorId: Joi.number().required(),
@@ -78,6 +77,90 @@ const getInspectorAudits = async (req, res) => {
 	}
 };
 
+const getClientAudits = async (req, res) => {
+	try {
+		const { search } = req.query;
+		const userId = parseInt(req.user.id);
+		const include = { survey: true };
+		let result;
+
+		if (search) {
+			result = await prisma.audit.findMany({
+				where: {
+					survey: { client: { userId } },
+					OR: [
+						{ survey: { hotelName: { contains: search } } },
+						{ survey: { campaign: { contains: search } } },
+					],
+				},
+				include,
+				orderBy,
+			});
+		} else {
+			result = await prisma.audit.findMany({
+				where: { survey: { client: { userId } } },
+				include,
+				orderBy,
+			});
+			if (!result.length) return res.status(404).json({ error: 'No audit found for this user!' });
+		}
+
+		res.status(200).json({ result });
+	} catch (error) {
+		console.error('Error fetching data:', error);
+		res.status(500).json({ error: 'An error occurred!' });
+	}
+};
+
+const getSurveyAudits = async (req, res) => {
+	try {
+		const { id: surveyId } = req.params;
+
+		const result = await prisma.audit.findMany({
+			where: { surveyId: parseInt(surveyId) },
+			select: {
+				id: true,
+				status: true,
+				createdAt: true,
+				inspector: {
+					select: { user: { select: { name: true } } },
+				},
+			},
+			orderBy,
+		});
+
+		// Format result
+		const formattedResult = result.map((audit) => ({
+			id: audit.id,
+			status: audit.status,
+			createdAt: new Date(audit.createdAt).toDateString(),
+			inspectorName: audit?.inspector?.user?.name,
+		}));
+		res.status(200).json({ result: formattedResult });
+	} catch (error) {
+		console.error('Error fetching data:', error);
+		res.status(500).json({ error: 'An error occurred!' });
+	}
+};
+
+const addFeedback = async (req, res) => {
+	try {
+		const { id: auditId } = req.params;
+		const { feedback } = req.body;
+
+		const audit = await prisma.audit.update({
+			where: { id: parseInt(auditId) },
+			data: { feedback },
+		});
+
+		if (!audit) return res.status(404).json({ error: 'Audit not found!' });
+		res.status(200).json({ message: 'Feedback updated successfully!', audit });
+	} catch (error) {
+		const prismaError = handlePrismaError(error);
+		res.status(prismaError.status).json(prismaError.response);
+	}
+};
+
 const getRecordById = async (req, res) => {
 	try {
 		const { id } = req.params;
@@ -127,7 +210,6 @@ const createRecord = async (req, res) => {
 			executiveSummary,
 			scenario,
 			status,
-			feedback,
 			surveyId,
 			responses,
 		} = value;
@@ -145,7 +227,6 @@ const createRecord = async (req, res) => {
 				executiveSummary,
 				scenario,
 				status,
-				feedback,
 				inspectorId: inspector.id,
 				surveyId,
 				responses: {
@@ -180,7 +261,6 @@ const updateRecord = async (req, res) => {
 			executiveSummary,
 			scenario,
 			status,
-			feedback,
 			surveyId,
 			responses,
 		} = value;
@@ -194,7 +274,6 @@ const updateRecord = async (req, res) => {
 				executiveSummary,
 				scenario,
 				status,
-				feedback,
 				surveyId,
 				responses: {
 					deleteMany: { auditId: parseInt(id) },
@@ -241,4 +320,7 @@ module.exports = {
 	updateRecord,
 	deleteRecord,
 	getInspectorAudits,
+	getSurveyAudits,
+	getClientAudits,
+	addFeedback,
 };
