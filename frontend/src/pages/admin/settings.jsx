@@ -1,54 +1,133 @@
 import { CategoryModal } from '@/components/CategoryModal';
+import DeleteModal from '@/components/DeleteModal';
 import Layout from '@/components/Layout';
 import { Loader } from '@/components/Loader';
-import { Button, Label, Modal, TextInput } from 'flowbite-react';
+import http from '@/config/axios';
+import { errorHandler } from '@/services/errorHandler';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-import { FaExclamationCircle } from 'react-icons/fa';
+import { useForm } from 'react-hook-form';
 import { RiAddFill, RiDeleteBin4Fill, RiEdit2Fill } from 'react-icons/ri';
+import { toast } from 'react-toastify';
 
 const DataTableX = dynamic(() => import('@/components/DataTableX'), { ssr: false, loading: Loader });
 
 const Settings = () => {
-	const [openModal, setOpenModal] = useState({ open: false, type: 'create' });
-	const [openDelModal, setOpenDelModal] = useState(false);
+	const [openModal, setOpenModal] = useState({ open: false, type: 'create', category: null });
+	const [openDelModal, setOpenDelModal] = useState({ open: false, category: null });
+	const [data, setData] = useState([]);
+	const [isLoading, setLoading] = useState(true);
+	const { register, watch } = useForm();
 
-	const ActionButtons = ({ id }) => {
-		const style =
-			'text-[17px] cursor-pointer rounded-sm p-1 text-[#252525] border border-gray-300 hover:bg-gray-200';
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const res = await http.get('/category');
+				if (res?.statusText == 'OK') {
+					console.log(res.data);
+					setData(res.data.result);
+				}
+			} catch (error) {
+				setData([]);
+				errorHandler(error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchData();
+	}, []);
+
+	if (isLoading) {
 		return (
-			<div className='flex gap-x-2'>
-				<div className={`${style}`} onClick={() => setOpenModal({ open: true, type: 'edit' })}>
-					<RiEdit2Fill />
-				</div>
-				<div className={`${style}`} onClick={() => setOpenDelModal(true)}>
-					<RiDeleteBin4Fill />
-				</div>
+			<div className='h-screen grid_center'>
+				<Loader />
 			</div>
 		);
-	};
+	}
 
 	const columns = [
 		{
 			name: 'ID',
-			selector: (row) => '#' + Math.floor(Math.random() * 9999) + 'C',
+			selector: (row) => '#' + row.id,
 			sortable: true,
 			minWidth: '20px',
 			maxWidth: '160px',
 		},
 		{
 			name: 'Title',
-			selector: (row) => 'Arrival and check in - General',
+			selector: (row) => row.title,
 			sortable: true,
 			minWidth: '50%',
 		},
-
 		{
 			name: 'Action',
 			maxWidth: '160px',
-			cell: (row) => <ActionButtons id={row.title} />,
+			cell: (row) => <ActionButtons category={row} />,
 		},
 	];
+
+	const ActionButtons = ({ category }) => {
+		const style =
+			'text-[17px] cursor-pointer rounded-sm p-1 text-[#252525] border border-gray-300 hover:bg-gray-200';
+		return (
+			<div className='flex gap-x-2'>
+				<div className={`${style}`} onClick={() => setOpenModal({ open: true, type: 'edit', category })}>
+					<RiEdit2Fill />
+				</div>
+				<div className={`${style}`} onClick={() => setOpenDelModal({ open: true, category })}>
+					<RiDeleteBin4Fill />
+				</div>
+			</div>
+		);
+	};
+
+	const searchRecord = async () => {
+		const keyword = watch('search');
+		try {
+			const res = await http.get(`/category?search=${keyword}`);
+			if (res?.statusText == 'OK') {
+				setData(res.data.result);
+			}
+		} catch (error) {
+			setData([]);
+			errorHandler(error);
+		}
+	};
+
+	const deleteRecord = async () => {
+		try {
+			const { id } = openDelModal.category;
+			const res = await http.delete('/category/' + id);
+			if (res?.statusText == 'OK') {
+				setData(res.data.result);
+				toast.success(res.data.message);
+			}
+		} catch (error) {
+			errorHandler(error);
+		}
+	};
+
+	const createOrUpdateRecord = async (category) => {
+		console.log(category);
+		try {
+			let res;
+			const { id, title } = category;
+			if (openModal.type == 'create') {
+				res = await http.post('/category', { title });
+			} else {
+				res = await http.put('/category/' + id, { title });
+			}
+
+			if (res?.statusText == 'OK') {
+				console.log(res.data);
+				setData(res.data.result);
+				toast.success(res.data.message);
+			}
+		} catch (error) {
+			errorHandler(error);
+		}
+	};
 
 	return (
 		<Layout>
@@ -62,51 +141,64 @@ const Settings = () => {
 				</div>
 
 				<div className='py-1 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
-					<div className='py-3 px-4 flex justify-between items-center'>
-						<p className='text-[13px] font-semibold'>Category (4)</p>
-						<div></div>
-						<input
-							type='text'
-							className='border border-gray-300 rounded-[4px] h-7 w-[200px] p-2 text-sm placeholder:text-[12px]'
-							placeholder='Search...'
-						/>
+					<div className='tableHeader py-2 px-4 flex justify-between items-center'>
+						<p className='text-[13px] font-semibold'>Category ({data.length})</p>
+
+						<div className='searchBox min-w-[40%]'>
+							<div className='relative w-full'>
+								<input
+									type='search'
+									className='block px-3 py-[6px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-md border-gray-200  border focus:ring-white focus:border-1 focus:border-[#252525]'
+									placeholder='Search...'
+									{...register('search')}
+									required
+								/>
+
+								<button
+									type='submit'
+									onClick={searchRecord}
+									className='absolute top-0 end-0 px-3 py-[6px] text-sm font-medium h-full text-white bg-[#252525] rounded-e-md border border-gray-900 hover:bg-opacity-85 '>
+									<svg
+										className='w-4 h-4'
+										aria-hidden='true'
+										xmlns='http://www.w3.org/2000/svg'
+										fill='none'
+										viewBox='0 0 20 20'>
+										<path
+											stroke='currentColor'
+											strokeLinecap='round'
+											strokeLinejoin='round'
+											strokeWidth={2}
+											d='m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z'
+										/>
+									</svg>
+									<span className='sr-only'>Search</span>
+								</button>
+							</div>
+						</div>
 					</div>
 
-					<DataTableX columns={columns} />
+					<DataTableX data={data} columns={columns} />
 				</div>
 			</div>
 
-			{openModal.open && <CategoryModal openModal={openModal} setOpenModal={setOpenModal} />}
-			{openDelModal && <DeleteModal openModal={openDelModal} setOpenModal={setOpenDelModal} />}
+			{openModal.open && (
+				<CategoryModal
+					openModal={openModal}
+					setOpenModal={setOpenModal}
+					createOrUpdateRecord={createOrUpdateRecord}
+				/>
+			)}
+
+			{openDelModal.open && (
+				<DeleteModal
+					openModal={openDelModal.open}
+					setOpenModal={setOpenDelModal}
+					deleteRecord={deleteRecord}
+				/>
+			)}
 		</Layout>
 	);
 };
-
-function DeleteModal({ openModal, setOpenModal, deleteFunc }) {
-	return (
-		<>
-			<Modal dismissible show={openModal} size='md' onClose={() => setOpenModal(false)} popup>
-				<Modal.Header />
-
-				<Modal.Body>
-					<div className='text-center'>
-						<FaExclamationCircle className='mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200' />
-						<h3 className='mb-5 text-lg font-normal text-gray-500 dark:text-gray-400'>
-							Are you sure you want to delete this item?
-						</h3>
-						<div className='flex justify-center gap-4'>
-							<Button color='failure' onClick={() => setOpenModal(false)}>
-								{"Yes, I'm sure"}
-							</Button>
-							<Button color='gray' onClick={() => setOpenModal(false)}>
-								No, cancel
-							</Button>
-						</div>
-					</div>
-				</Modal.Body>
-			</Modal>
-		</>
-	);
-}
 
 export default Settings;

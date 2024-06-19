@@ -35,17 +35,10 @@ export default function Login() {
 			}
 		} catch (error) {
 			console.log(error);
-			// if (error.name == 'AxiosError' && error?.response?.data?.error) {
-			// 	return toast.error(error.response.data.error);
-			// }
-			// return toast.error('An error ocurred. Please try again!');
-
-			// For testing purposes - login without backend
-			const user = { role: 'Admin' };
-			const token = '1234567890';
-			localStorage.setItem('user', JSON.stringify(user));
-			localStorage.setItem('token', token);
-			router.push(`/${user.role.toLowerCase()}`);
+			if (error.name == 'AxiosError' && error?.response?.data?.error) {
+				return toast.error(error.response.data.error);
+			}
+			return toast.error('An error ocurred. Please try again!');
 		}
 	};
 
@@ -93,7 +86,7 @@ export default function Login() {
 								<div className='mt-2'>
 									<input
 										type='password'
-										{...register('password', { required: true, minLength: 4 })}
+										{...register('password', { required: true })}
 										autoComplete='current-password'
 										className='block w-full rounded-md border border-gray-400 py-2 text-gray-900 placeholder:text-gray-400 !ring-0 focus:border-[#252525] sm:text-sm sm:leading-6'
 									/>

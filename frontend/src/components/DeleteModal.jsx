@@ -2,10 +2,15 @@ import { Button, Modal } from 'flowbite-react';
 import React from 'react';
 import { FaExclamationCircle } from 'react-icons/fa';
 
-const DeleteModal = ({ openModal, setOpenModal, deleteFunc }) => {
+const DeleteModal = ({ openModal, setOpenModal, deleteRecord }) => {
+	const action = () => {
+		deleteRecord();
+		setOpenModal({ open: false });
+	};
+
 	return (
 		<>
-			<Modal dismissible show={openModal} size='md' onClose={() => setOpenModal(false)} popup>
+			<Modal dismissible show={openModal} size='md' onClose={() => setOpenModal({ open: false })} popup>
 				<Modal.Header />
 
 				<Modal.Body>
@@ -15,10 +20,10 @@ const DeleteModal = ({ openModal, setOpenModal, deleteFunc }) => {
 							Are you sure you want to delete this item?
 						</h3>
 						<div className='flex justify-center gap-4'>
-							<Button color='failure' onClick={() => setOpenModal(false)}>
+							<Button color='failure' onClick={action}>
 								{"Yes, I'm sure"}
 							</Button>
-							<Button color='gray' onClick={() => setOpenModal(false)}>
+							<Button color='gray' onClick={() => setOpenModal({ open: false })}>
 								No, cancel
 							</Button>
 						</div>

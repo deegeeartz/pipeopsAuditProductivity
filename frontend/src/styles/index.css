@@ -36,7 +36,7 @@ img {
 	display: grid;
 	align-content: center;
 }
-.gd_center_content {
+.grid_center {
 	display: grid;
 	align-content: center;
 	justify-content: center;
@@ -67,6 +67,12 @@ img {
 }
 
 /*!----- SECTIONS -------*/
+.tableHeader {
+	padding: 6px 16px 10px !important;
+	border-bottom-width: 1px;
+	border-bottom-color: rgba(0, 0, 0, 0.12);
+	border-bottom-style: solid;
+}
 .rdt_Pagination select {
 	background-image: none !important;
 	padding-right: 24px !important;
@@ -85,9 +91,9 @@ img {
 	font-size: 12px;
 	font-weight: bold;
 	text-transform: uppercase;
-	border-top-width: 1px;
+	/* border-top-width: 1px;
 	border-top-color: rgba(0, 0, 0, 0.12);
-	border-top-style: solid;
+	border-top-style: solid; */
 }
 .datatable .rdt_TableCol > div > div,
 .datatable .rdt_TableCell > div {

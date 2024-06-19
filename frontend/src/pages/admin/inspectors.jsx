@@ -1,79 +1,186 @@
+import DeleteModal from '@/components/DeleteModal';
 import Layout from '@/components/Layout';
 import { Loader } from '@/components/Loader';
-import { Button, Label, Modal, TextInput } from 'flowbite-react';
+import http from '@/config/axios';
+import { errorHandler } from '@/services/errorHandler';
+import { Label, Modal, TextInput } from 'flowbite-react';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-import { FaExclamationCircle } from 'react-icons/fa';
-import { RiAddFill, RiDeleteBin4Fill, RiEdit2Fill } from 'react-icons/ri';
+import { useForm } from 'react-hook-form';
+import { RiAddFill, RiDeleteBin4Fill, RiEdit2Fill, RiSearch2Line } from 'react-icons/ri';
+import { toast } from 'react-toastify';
 
 const DataTableX = dynamic(() => import('@/components/DataTableX'), { ssr: false, loading: Loader });
 
 const Inspectors = () => {
-	const [openModal, setOpenModal] = useState({ open: false, type: 'create' });
-	const [openDelModal, setOpenDelModal] = useState(false);
+	const [openModal, setOpenModal] = useState({ open: false, type: 'create', data: null });
+	const [openDelModal, setOpenDelModal] = useState({ open: false, data: null });
+	const [data, setData] = useState([]);
+	const [searchTerm, setSearchTerm] = useState('');
+	const [isLoading, setLoading] = useState(true);
 
-	const ActionButtons = ({ id }) => {
-		const style =
-			'text-[17px] cursor-pointer rounded-sm p-1 text-[#252525] border border-gray-300 hover:bg-gray-200';
+	const fetchData = async () => {
+		try {
+			const res = await http.get('/inspector');
+			if (res?.statusText == 'OK') {
+				console.log('fetchData:', res.data);
+				setData(res.data.result);
+			}
+		} catch (error) {
+			setData([]);
+			errorHandler(error);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		fetchData();
+	}, []);
+
+	if (isLoading) {
 		return (
-			<div className='flex gap-x-2'>
-				<div className={`${style}`} onClick={() => setOpenModal({ open: true, type: 'edit' })}>
-					<RiEdit2Fill />
-				</div>
-				<div className={`${style}`} onClick={() => setOpenDelModal(true)}>
-					<RiDeleteBin4Fill />
-				</div>
+			<div className='h-screen grid_center'>
+				<Loader />
 			</div>
 		);
-	};
+	}
 
 	const columns = [
 		{
 			name: 'ID',
-			selector: (row) => '#0625',
+			selector: (row) => '#' + row.id,
 			sortable: true,
 			minWidth: '0px',
 		},
 		{
 			name: 'Name',
-			selector: (row) => 'GSmith Ltd',
+			selector: (row) => row.user.name,
 			sortable: true,
-			minWidth: '110px',
+			minWidth: '120px',
 		},
 		{
 			name: 'Email',
-			selector: (row) => 'dytech.studio@gmail.com',
+			selector: (row) => row.user.email,
 			sortable: true,
 			minWidth: '210px',
 		},
 		{
+			name: 'Phone No',
+			selector: (row) => row.phoneNumber,
+			sortable: true,
+			minWidth: '130px',
+		},
+		{
+			name: 'Location',
+			selector: (row) => row.location,
+			sortable: true,
+			minWidth: '160px',
+		},
+		{
+			name: 'Language',
+			selector: (row) => row.language,
+			sortable: true,
+			minWidth: '115px',
+		},
+		{
 			name: 'Passcode',
 			sortable: true,
-			minWidth: '120px',
+			minWidth: '115px',
 			cell: (row) => {
-				let passcode = row.title;
+				let passcode = row.passcode;
+				const action = () => {
+					navigator.clipboard.writeText(passcode);
+					return alert(`Copied to clipboard! PASSCODE: ${passcode}`);
+				};
 				return (
-					<div
-						onClick={() => {
-							console.log(row.title);
-						}}>
-						{<p>********</p>}
+					<div className='cursor-pointer' onClick={action}>
+						<p>********</p>
 					</div>
 				);
 			},
 		},
 		{
 			name: 'Date Added',
-			selector: (row) => row.date,
+			selector: (row) => new Date(row?.user?.created_at).toLocaleDateString(),
 			sortable: true,
-			minWidth: '110px',
+			minWidth: '100px',
 		},
 		{
 			name: 'Action',
-			minWidth: '150px',
-			cell: (row) => <ActionButtons id={row.title} />,
+			minWidth: '100px',
+			cell: (row) => <ActionButtons data={row} />,
 		},
 	];
+
+	const ActionButtons = ({ data }) => {
+		const style =
+			'text-[17px] cursor-pointer rounded-sm p-1 text-[#252525] border border-gray-300 hover:bg-gray-200';
+		return (
+			<div className='flex gap-x-2'>
+				<div className={`${style}`} onClick={() => setOpenModal({ open: true, type: 'edit', data })}>
+					<RiEdit2Fill />
+				</div>
+				<div className={`${style}`} onClick={() => setOpenDelModal({ open: true, data })}>
+					<RiDeleteBin4Fill />
+				</div>
+			</div>
+		);
+	};
+
+	const searchRecord = async (keyword) => {
+		setSearchTerm(keyword);
+		try {
+			const res = await http.get(`/inspector?search=${keyword}`);
+			if (res?.status == 200) {
+				setData(res.data.result);
+			}
+		} catch (error) {
+			setData([]);
+			errorHandler(error);
+		}
+	};
+
+	const createOrUpdateRecord = async (data) => {
+		const payload = {
+			location: data?.location,
+			language: data?.language,
+			phoneNumber: data?.phoneNumber,
+			name: data?.name,
+			email: data?.email,
+			password: data?.passcode,
+		};
+
+		try {
+			let res;
+			if (openModal.type == 'create') {
+				res = await http.post('/inspector', payload);
+			} else {
+				const id = openModal.data.id;
+				res = await http.put('/inspector/' + id, payload);
+			}
+
+			if ([200, 201].includes(res?.status)) {
+				fetchData();
+				toast.success(res.data.message);
+			}
+		} catch (error) {
+			errorHandler(error);
+		}
+	};
+
+	const deleteRecord = async () => {
+		try {
+			const id = openDelModal.data.id;
+			const res = await http.delete('/inspector/' + id);
+			if (res?.statusText == 'OK') {
+				fetchData();
+				toast.success(res.data.message);
+			}
+		} catch (error) {
+			errorHandler(error);
+		}
+	};
 
 	return (
 		<Layout>
@@ -87,114 +194,136 @@ const Inspectors = () => {
 				</div>
 
 				<div className='py-1 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
-					<div className='py-3 px-4 flex justify-between items-center'>
-						<p className='text-[13px] font-semibold'>Total (4)</p>
-						<div></div>
-						<input
-							type='text'
-							className='border border-gray-300 rounded-[4px] h-7 w-[200px] p-2 text-sm placeholder:text-[12px]'
-							placeholder='Search...'
-						/>
+					<div className='tableHeader py-2 px-4 flex justify-between items-center'>
+						<p className='text-[13px] font-semibold'>Total ({data.length})</p>
+
+						<div className='searchBox min-w-[40%]'>
+							<div className='relative w-full'>
+								<div className='absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none'>
+									<RiSearch2Line color='#b2b6bc' />
+								</div>
+								<input
+									type='text'
+									className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full ps-10 px-3 py-[8px] focus:border-1 focus:border-[#252525] focus:ring-white'
+									placeholder='Search...'
+									value={searchTerm}
+									onChange={(e) => searchRecord(e.target.value)}
+								/>
+							</div>
+						</div>
 					</div>
 
-					<DataTableX columns={columns} />
+					<DataTableX data={data} columns={columns} />
 				</div>
 			</div>
 
-			{openModal.open && <InspectorModal openModal={openModal} setOpenModal={setOpenModal} />}
-			{openDelModal && <DeleteModal openModal={openDelModal} setOpenModal={setOpenDelModal} />}
+			{openModal.open && (
+				<InspectorModal
+					openModal={openModal}
+					setOpenModal={setOpenModal}
+					createOrUpdateRecord={createOrUpdateRecord}
+				/>
+			)}
+
+			{openDelModal.open && (
+				<DeleteModal
+					openModal={openDelModal.open}
+					setOpenModal={setOpenDelModal}
+					deleteRecord={deleteRecord}
+				/>
+			)}
 		</Layout>
 	);
 };
 
-function InspectorModal({ openModal, setOpenModal }) {
-	const [name, setName] = useState('');
-	const [email, setEmail] = useState('');
-	const [passcode, setPasscode] = useState('');
-
+function InspectorModal({ openModal, setOpenModal, createOrUpdateRecord }) {
+	const { register, handleSubmit, watch } = useForm();
 	const isEdit = openModal.type === 'edit';
+	const data = openModal.data;
 
 	useEffect(() => {
-		const setField = () => {
-			setName('Test User');
-			setEmail('dycodes51@gmail.com');
-			setPasscode('hello25653');
-		};
-
-		isEdit && setField();
+		console.log(data);
 	}, []);
+
+	const action = (data) => {
+		createOrUpdateRecord(data);
+		setOpenModal({ open: false });
+	};
 
 	return (
 		<>
-			<Modal dismissible show={openModal.open} onClose={() => setOpenModal({ ...openModal, open: false })}>
+			<Modal dismissible show={openModal.open} onClose={() => setOpenModal({ open: false })}>
 				<Modal.Header>{isEdit ? 'Edit Inspector' : 'Create New Inspector'}</Modal.Header>
 
 				<Modal.Body>
-					<div className='space-y-6'>
+					<form onSubmit={handleSubmit(action)} className='space-y-4'>
 						<div>
-							<div className='mb-2 block'>
+							<div className='mb-1 block'>
 								<Label htmlFor='name' value='Name' />
 							</div>
-							<TextInput id='name' value={name} onChange={(e) => setName(e.target.value)} required />
+							<TextInput id='name' defaultValue={data?.user.name || ''} {...register('name')} required />
 						</div>
 
 						<div>
-							<div className='mb-2 block'>
+							<div className='mb-1 block'>
 								<Label htmlFor='email' value='Email Address' />
 							</div>
 							<TextInput
 								id='email'
-								placeholder='name@company.com'
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
+								placeholder='name@example.com'
+								defaultValue={data?.user.email || ''}
+								{...register('email')}
 								required
 							/>
 						</div>
 
 						<div>
-							<div className='mb-2 block'>
+							<div className='mb-1 block'>
+								<Label htmlFor='location' value='Location' />
+							</div>
+							<TextInput
+								id='location'
+								defaultValue={data?.location || ''}
+								{...register('location')}
+								required
+							/>
+						</div>
+
+						<div>
+							<div className='mb-1 block'>
+								<Label htmlFor='phoneNumber' value='Phone number' />
+							</div>
+							<TextInput
+								id='phoneNumber'
+								defaultValue={data?.phoneNumber || ''}
+								{...register('phoneNumber')}
+							/>
+						</div>
+
+						<div>
+							<div className='mb-1 block'>
+								<Label htmlFor='language' value='Language' />
+							</div>
+							<TextInput id='language' defaultValue={data?.language || ''} {...register('language')} />
+						</div>
+
+						<div>
+							<div className='mb-1 block'>
 								<Label htmlFor='passcode' value='Passcode' />
 							</div>
 							<TextInput
 								id='passcode'
 								type={isEdit ? 'text' : 'password'}
-								value={passcode}
-								onChange={(e) => setPasscode(e.target.value)}
+								defaultValue={data?.passcode || ''}
+								{...register('passcode')}
 								required
 							/>
 						</div>
 
-						<div className='w-full'>
+						<div className='w-full py-2'>
 							<button className='btn_primary px-8 w-36'>{isEdit ? 'Update' : 'Create'}</button>
 						</div>
-					</div>
-				</Modal.Body>
-			</Modal>
-		</>
-	);
-}
-
-function DeleteModal({ openModal, setOpenModal, deleteFunc }) {
-	return (
-		<>
-			<Modal dismissible show={openModal} size='md' onClose={() => setOpenModal(false)} popup>
-				<Modal.Header />
-
-				<Modal.Body>
-					<div className='text-center'>
-						<FaExclamationCircle className='mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200' />
-						<h3 className='mb-5 text-lg font-normal text-gray-500 dark:text-gray-400'>
-							Are you sure you want to delete this item?
-						</h3>
-						<div className='flex justify-center gap-4'>
-							<Button color='failure' onClick={() => setOpenModal(false)}>
-								{"Yes, I'm sure"}
-							</Button>
-							<Button color='gray' onClick={() => setOpenModal(false)}>
-								No, cancel
-							</Button>
-						</div>
-					</div>
+					</form>
 				</Modal.Body>
 			</Modal>
 		</>

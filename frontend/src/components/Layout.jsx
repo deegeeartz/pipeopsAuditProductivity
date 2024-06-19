@@ -19,11 +19,11 @@ const Layout = ({ children }) => {
 	const router = useRouter();
 	const { pathname } = router;
 	const [sidebarOpen, setSidebarOpen] = useState(false);
-	const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		// authMiddleware(router, 'protected');
-		// userIsLoggedIn() && setLoading(false);
+		authMiddleware(router, 'protected');
+		userIsLoggedIn() && setLoading(false);
 	}, []);
 
 	const toggleSidebar = () => {
@@ -56,7 +56,7 @@ const Layout = ({ children }) => {
 	return (
 		<>
 			<Head>
-				<title>Audit Pro</title>
+				<title>Bespoke Audits</title>
 			</Head>
 
 			{!loading && (

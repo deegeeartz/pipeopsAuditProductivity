@@ -1,18 +1,14 @@
 import { Label, Modal, TextInput } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 
-export function CategoryModal({ openModal, setOpenModal }) {
-	const [category, setCategory] = useState('');
-
+export function CategoryModal({ openModal, setOpenModal, createOrUpdateRecord }) {
+	const [category, setCategory] = useState(openModal.category);
 	const isEdit = openModal.type === 'edit';
 
-	useEffect(() => {
-		const setField = () => {
-			setCategory('Arrival and check in - General');
-		};
-
-		isEdit && setField();
-	}, []);
+	const action = () => {
+		createOrUpdateRecord(category);
+		setOpenModal({ open: false });
+	};
 
 	return (
 		<>
@@ -20,7 +16,7 @@ export function CategoryModal({ openModal, setOpenModal }) {
 				dismissible
 				position={'center'}
 				show={openModal.open}
-				onClose={() => setOpenModal({ ...openModal, open: false })}>
+				onClose={() => setOpenModal({ open: false })}>
 				<Modal.Header>{isEdit ? 'Edit Category' : 'Add New Category'}</Modal.Header>
 
 				<Modal.Body>
@@ -31,15 +27,17 @@ export function CategoryModal({ openModal, setOpenModal }) {
 							</div>
 							<TextInput
 								id='category'
-								value={category}
-								onChange={(e) => setCategory(e.target.value)}
+								value={category?.title || ''}
+								onChange={(e) => setCategory({ ...category, title: e.target.value })}
 								required
 								// placeholder='Enter category'
 							/>
 						</div>
 
 						<div className='w-full'>
-							<button className='btn_primary px-8 w-36'>{isEdit ? 'Update' : 'Submit'}</button>
+							<button className='btn_primary px-8 w-36' onClick={action}>
+								{isEdit ? 'Update' : 'Submit'}
+							</button>
 						</div>
 					</div>
 				</Modal.Body>

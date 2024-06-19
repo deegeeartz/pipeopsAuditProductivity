@@ -1,14 +1,6 @@
 import DataTable from 'react-data-table-component';
 
-const DataTableX = ({ columns }) => {
-	const customStyles = {
-		rows: {
-			style: {
-				minHeight: '62px',
-			},
-		},
-	};
-
+const DataTableX = ({ data, columns }) => {
 	return (
 		<DataTable
 			className='datatable'
@@ -23,31 +15,12 @@ const DataTableX = ({ columns }) => {
 	);
 };
 
-const data = [
-	{
-		id: 1,
-		title: 'Beetlejuice',
-		date: '12 Mar, 2024',
-		director: 'Hello Wrld',
+const customStyles = {
+	rows: {
+		style: {
+			minHeight: '62px',
+		},
 	},
-	{
-		id: 2,
-		title: 'Ghostbusters',
-		date: '12 Mar, 2024',
-		director: 'Hello Wrld',
-	},
-	{
-		id: 12,
-		title: 'Beetlejuice',
-		date: '12 Mar, 2024',
-		director: 'Hello Wrld',
-	},
-	{
-		id: 13,
-		title: 'Beetlejuice',
-		date: '12 Mar, 2024',
-		director: 'Hello Wrld',
-	},
-];
+};
 
 export default DataTableX;
