@@ -1,7 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const Joi = require('joi');
 const handlePrismaError = require('../../utils/handlePrismaError');
-const { hashPassword } = require('../../utils/hashPassword');
 
 const prisma = new PrismaClient();
 const orderBy = { id: 'desc' };
@@ -21,16 +20,16 @@ const getAllRecords = async (req, res) => {
 	try {
 		const { search } = req.query;
 		let result;
-		const include = { _count: { select: { questions: true } } };
+		const include = {
+			_count: {
+				select: { questions: true, audits: true },
+			},
+		};
 
 		if (search) {
 			result = await prisma.survey.findMany({
 				where: {
-					OR: [
-						{ clientName: { contains: search } },
-						{ hotelName: { contains: search } },
-						{ campaign: { contains: search } },
-					],
+					OR: [{ clientName: { contains: search } }, { hotelName: { contains: search } }],
 				},
 				include,
 				orderBy,
@@ -52,11 +51,27 @@ const getRecordById = async (req, res) => {
 		const { id } = req.params;
 		const result = await prisma.survey.findUnique({
 			where: { id: parseInt(id) },
-			include: { questions: true },
+			include: {
+				questions: { include: { category: true } },
+			},
 		});
 		if (!result) return res.status(404).json({ error: 'Survey not found!' });
 
-		res.status(200).json({ result });
+		// Group questions by category
+		const categories = {};
+		result.questions.forEach((question) => {
+			const category = question.category;
+			if (!categories[category.id]) {
+				categories[category.id] = {
+					id: category.id,
+					title: category.title,
+					questions: [],
+				};
+			}
+			categories[category.id].questions.push(question);
+		});
+
+		res.status(200).json({ result: { ...result, categories: Object.values(categories) } });
 	} catch (error) {
 		const prismaError = handlePrismaError(error);
 		res.status(prismaError.status).json(prismaError.response);
@@ -85,7 +100,7 @@ const createRecord = async (req, res) => {
 					create: questions.map((question) => ({
 						type: question.type,
 						text: question.text,
-						options: question.options ? JSON.stringify(question.options) : null,
+						options: question.options ?? {},
 						categoryId: question.categoryId,
 					})),
 				},
@@ -127,7 +142,7 @@ const updateRecord = async (req, res) => {
 					create: questions.map((question) => ({
 						type: question.type,
 						text: question.text,
-						options: question.options ? JSON.stringify(question.options) : null,
+						options: question.options ?? {},
 						categoryId: question.categoryId,
 					})),
 				},

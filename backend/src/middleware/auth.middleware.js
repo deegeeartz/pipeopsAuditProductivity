@@ -25,7 +25,14 @@ exports.auth = async (req, res, next) => {
 
 exports.onlyAdmin = async (req, res, next) => {
 	if (req.user.role === 'ADMIN') {
-		next();
+		return next();
 	}
 	return res.status(403).json({ error: 'Unauthorized access!' });
+};
+
+exports.inspectorOnly = async (req, res, next) => {
+	if (req.user.role === 'INSPECTOR') {
+		return next();
+	}
+	return res.status(403).json({ error: 'Unauthorized access. Inspector Only!' });
 };

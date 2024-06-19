@@ -46,7 +46,7 @@ model Client {
   additionalNotes String?
   passcode        String?
 
-  survey Survey[]
+  surveys Survey[]
 }
 
 model Inspector {
@@ -59,6 +59,7 @@ model Inspector {
   language    String?
   phoneNumber String?
   passcode    String?
+  audits      Audit[]
 }
 
 // SURVEY
@@ -81,6 +82,7 @@ model Survey {
   // Relationships
   questions Question[]
   client    Client     @relation(fields: [clientId], references: [id])
+  audits    Audit[]
 }
 
 model Category {
@@ -98,6 +100,43 @@ model Question {
   surveyId   Int
 
   // Relationships
-  category Category @relation(fields: [categoryId], references: [id])
-  survey   Survey   @relation(fields: [surveyId], references: [id])
+  category  Category   @relation(fields: [categoryId], references: [id])
+  survey    Survey     @relation(fields: [surveyId], references: [id])
+  responses Response[]
+}
+
+model Audit {
+  id               Int     @id @default(autoincrement())
+  expense          String?
+  brandStandard    String?
+  detailedSummary  String?
+  executiveSummary String?
+  scenario         String?
+  status           String?
+  feedback         String?
+  inspectorId      Int
+  surveyId         Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  responses Response[]
+  inspector Inspector  @relation(fields: [inspectorId], references: [id])
+  survey    Survey     @relation(fields: [surveyId], references: [id])
+}
+
+model Response {
+  id Int @id @default(autoincrement())
+
+  answer       String?
+  optionAnswer String?
+  files        Json?
+  skip         Boolean?
+  questionId   Int
+  auditId      Int
+
+  // Relationships
+  question Question @relation(fields: [questionId], references: [id])
+  audit    Audit    @relation(fields: [auditId], references: [id])
 }

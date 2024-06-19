@@ -13,14 +13,24 @@ content-type: application/json
 
 ###
 
-GET http://localhost:8080/api/user/clients
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzE2Mzg3OTE1LCJleHAiOjE3MTY2NDcxMTV9.RbiQI5y08jYbD4WvxbJ2NDjJh4ctstevqiS_2bHZLkQ
+POST http://bespoke-api.onrender.com/api/auth/login 
+content-type: application/json
+
+{
+	"email": "yusufdaudu51@gmail.com",
+	"password": "yusufdaudu51@gmail.com"
+}
+
+###
+
+GET http://localhost:8080/api/admin/stats
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzE2NTQxNTg5LCJleHAiOjE3MTY1NTU5ODl9.0w-eKOS3CbDaCqJ-qIF2TGnngR36PSdBbaCUkhrWHjI
 
 ###
 
 POST http://localhost:8080/api/user/clients 
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzE2Mzg3OTE1LCJleHAiOjE3MTY2NDcxMTV9.RbiQI5y08jYbD4WvxbJ2NDjJh4ctstevqiS_2bHZLkQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzE2NTQxNTg5LCJleHAiOjE3MTY1NTU5ODl9.0w-eKOS3CbDaCqJ-qIF2TGnngR36PSdBbaCUkhrWHjI
 
 {
 	"hotelName": "Hotel Dave",

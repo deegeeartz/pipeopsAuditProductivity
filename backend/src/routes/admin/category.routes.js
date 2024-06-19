@@ -81,12 +81,17 @@ router.delete('/:id', async (req, res) => {
 		const category = await prisma.category.findUnique({ where: { id: parseInt(id) } });
 		if (!category) return res.status(404).json({ error: 'Category not found!' });
 
-		// Delete the event
+		// Delete related questions first
+		await prisma.question.deleteMany({ where: { categoryId: parseInt(id) } });
+		// Delete record
 		await prisma.category.delete({ where: { id: parseInt(id) } });
-		const result = await prisma.category.findMany({ orderBy });
 
 		// Return response
-		res.status(200).json({ result, message: 'Category deleted successfully!' });
+		const result = await prisma.category.findMany({ orderBy });
+		res.status(200).json({
+			result,
+			message: 'Category and any related questions has been deleted successfully! ',
+		});
 	} catch (error) {
 		const prismaError = handlePrismaError(error);
 		res.status(prismaError.status).json(prismaError.response);

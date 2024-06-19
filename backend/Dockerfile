@@ -13,6 +13,9 @@ COPY . .
 # Installing dependencies
 RUN npm install
 
+RUN npx prisma generate
+RUN npx prisma migrate deploy
+
 # Installing pm2 globally
 RUN npm install pm2 -g
 
@@ -20,4 +23,4 @@ RUN npm install pm2 -g
 CMD pm2 start process.yml && tail -f /dev/null
 
 # Exposing server port
-EXPOSE 5000
+EXPOSE 4590

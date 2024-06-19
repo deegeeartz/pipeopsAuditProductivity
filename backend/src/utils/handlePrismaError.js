@@ -20,12 +20,29 @@ const handlePrismaError = (error) => {
 				};
 			default:
 				// Handling other validation errors
-				return { status: 400, response: { error: 'Validation error', errorObject: error } };
+				return { status: 400, response: { error: 'Validation error!', errorObject: error } };
+		}
+	}
+
+	if (error?.name === 'PrismaClientKnownRequestError') {
+		switch (error.code) {
+			case 'P2003':
+				// Handling foreign key constraint errors
+				return {
+					status: 400,
+					response: {
+						error: `Failed to delete due to related records. Remove records and try again.`,
+						errorObject: error,
+					},
+				};
+			default:
+				// Handling other database errors
+				return { status: 500, response: { error: 'Database error!', errorObject: error } };
 		}
 	}
 
 	// Handling all other errors
-	return { status: 500, response: { error: 'An error occurred', errorObject: error } };
+	return { status: 500, response: { error: 'An error occurred!', errorObject: error } };
 };
 
 module.exports = handlePrismaError;
