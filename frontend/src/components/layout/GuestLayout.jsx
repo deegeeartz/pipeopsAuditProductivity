@@ -16,7 +16,7 @@ const GuestLayout = ({ children }) => {
 	return (
 		<>
 			<Head>
-				<title>Bespoke Audits</title>
+				<title>H-Audit</title>
 			</Head>
 
 			<main>{children}</main>

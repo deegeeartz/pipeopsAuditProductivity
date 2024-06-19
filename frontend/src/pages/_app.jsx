@@ -11,7 +11,7 @@ export default function App({ Component, pageProps }) {
 	return (
 		<div className={font.className}>
 			<Head>
-				<title>Bespoke Audits</title>
+				<title>H-Audit</title>
 				<link rel='icon' href='/icon.png' type='image/PNG' />
 			</Head>
 

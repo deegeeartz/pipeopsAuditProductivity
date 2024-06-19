@@ -72,7 +72,7 @@ const Layout = ({ children }) => {
 	return (
 		<>
 			<Head>
-				<title>Bespoke Audits</title>
+				<title>H-Audit</title>
 			</Head>
 
 			{/* SIDEBAR */}
