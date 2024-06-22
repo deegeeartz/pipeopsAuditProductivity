@@ -81,7 +81,7 @@ const Layout = ({ children }) => {
 					sidebarOpen ? '-translate-x-0' : '-translate-x-full'
 				}`}>
 				<Link href='/' className='flex items-center pb-5'>
-					<img src='/logo.png' alt='Logo' className='w-[80px] mx-auto' />
+					<img src='/logo.png' alt='Logo' className='w-[90px] mx-auto' />
 				</Link>
 
 				<ul className='mt-4'>
