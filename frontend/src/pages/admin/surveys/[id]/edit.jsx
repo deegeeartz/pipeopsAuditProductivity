@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import Layout from '@/components/layout/DashboardLayout';
-import { RiArrowLeftLine, RiUpload2Line } from 'react-icons/ri';
+import { RiArrowLeftLine, RiShare2Line, RiUpload2Line } from 'react-icons/ri';
 import Link from 'next/link';
 import { Accordion } from 'flowbite-react';
-import { FloatField, InputFieldStatic, SelectField } from '@/components/Fields';
+import { FloatField, SelectField } from '@/components/Fields';
 import { CategoryPanel, QuestionBox } from '@/components/QuestionUI';
 import { toast } from 'react-toastify';
 import { CategoryModal } from '@/components/CategoryModal';
@@ -12,32 +12,34 @@ import { errorHandler } from '@/utils/errorHandler';
 import http from '@/config/axios';
 import { useRouter } from 'next/router';
 import AddQuestion from '@/components/survey/AddQuestion';
+import { LocationSuggestionInput2 } from '@/components/form/LocationSuggestionField';
+import { AutoSaveButton } from '@/components/common/AutoSaveButton';
+import { ShareModal } from '@/components/survey/ShareModal';
 
 const EditSurvey = () => {
 	const router = useRouter();
 	const { id: surveyId } = router.query;
 	const [step, setStep] = useState(1);
 	const [openCatModal, setOpenCatModal] = useState({ open: false });
+	const [openSModal, setOpenSModal] = useState(false);
 	const [CATEGORIES, setCategories] = useState([]);
 	const [CLIENTS, setClients] = useState([]);
 	const [formData, setFormData] = useState({});
 	const [questions, setQuestions] = useState([]);
 	const [isLoading, setLoading] = useState(true);
+	const [loadingAPI, setLoadingAPI] = useState(false);
 
 	const fetchData = async () => {
 		try {
 			const survey = await http.get('/survey/' + surveyId);
-			const categories = await http.get('/category');
 			const clients = await http.get('/client/list');
+			const categories = await http.get('/category/list');
 
-			if (survey?.status == 200 && categories?.status == 200 && clients?.status == 200) {
-				// console.log(categories.data.result, clients.data.result);
-				setCategories(categories.data.result);
-				setClients(clients.data.result);
-				setFormData(survey.data.result);
-				setQuestions(survey.data.result.questions);
-
-				console.log(categories.data.result, survey.data.result.questions);
+			if (survey?.status == 200 || categories?.status == 200 || clients?.status == 200) {
+				setCategories(categories?.data?.result || []);
+				setClients(clients?.data?.result || []);
+				setFormData(survey?.data?.result || {});
+				setQuestions(survey?.data?.result?.questions || []);
 			}
 		} catch (error) {
 			errorHandler(error);
@@ -61,7 +63,7 @@ const EditSurvey = () => {
 	}
 
 	const nextStep = () => {
-		console.log(formData);
+		// console.log(formData);
 
 		const fieldValidation = () => {
 			if (!formData?.clientId) {
@@ -89,8 +91,10 @@ const EditSurvey = () => {
 
 	const onFormSubmit = async (el) => {
 		el.preventDefault();
+		setLoadingAPI(true);
 
 		const { name: clientName } = CLIENTS.filter((item) => item.id == formData?.clientId)[0].user;
+
 		const payload = {
 			hotelName: formData?.hotelName,
 			campaign: formData?.campaign,
@@ -102,8 +106,7 @@ const EditSurvey = () => {
 			questions: questions.map((question) => ({ ...question, categoryId: parseInt(question.categoryId) })),
 		};
 
-		console.log('payload', payload);
-		// return console.log('payload: ', payload);
+		// return console.log('payload', payload);
 
 		try {
 			const res = await http.put(`/survey/${surveyId}`, payload);
@@ -112,6 +115,8 @@ const EditSurvey = () => {
 			}
 		} catch (error) {
 			errorHandler(error);
+		} finally {
+			setLoadingAPI(false);
 		}
 	};
 
@@ -124,23 +129,25 @@ const EditSurvey = () => {
 			<div className='content p-6'>
 				<div className='mb-7 flex justify-between items-center'>
 					<h1 className='font-bold text-lg text-[#222]'>Edit Survey</h1>
-					<Link href='/admin/surveys' className='btn_primary _flex'>
-						<RiArrowLeftLine className='mr-2 h-5 w-5' />
-						<span className='hidden md:block'>All Surveys</span>
-					</Link>
+
+					<div onClick={() => setOpenSModal(true)} className='btn_primary _flex cursor-pointer mr-3'>
+						<RiShare2Line className='mr-2 h-5 w-5' />
+						<span className='hidden md:block'>Share</span>
+					</div>
 				</div>
 
 				<div className='py-7 px-5 mb-8 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
 					<form className='w-full' onSubmit={onFormSubmit}>
+						{/* STEP 1 */}
 						<div className={`step1 details ${step !== 1 && 'hidden'}`}>
 							<h3 className='heading text-xl font-semibold mb-8 uppercase'>Survey Details</h3>
 
 							<div className='mb-5'>
 								<SelectField
 									label={'Client'}
-									value={formData.clientId ?? ''}
+									value={formData.clientId || ''}
 									onChange={(el) => setFormData({ ...formData, clientId: el.target.value })}>
-									<option>select client</option>
+									<option value=''>select client</option>
 
 									{/* Display clients */}
 									{CLIENTS.map((item) => (
@@ -168,10 +175,10 @@ const EditSurvey = () => {
 							</div>
 
 							<div className='mb-5'>
-								<FloatField
+								<LocationSuggestionInput2
 									label={'Location'}
 									value={formData.location ?? ''}
-									onChange={(el) => setFormData({ ...formData, location: el.target.value })}
+									handleInputValue={(text) => setFormData({ ...formData, location: text })}
 								/>
 							</div>
 
@@ -194,16 +201,9 @@ const EditSurvey = () => {
 									onClick={(el) => el.target.showPicker()}
 								/>
 							</div>
-
-							{/* <div className='mb-5'>
-								<SelectField label={'Assign Inspector'}>
-									<option>select inspector</option>
-									<option>Paul Smith</option>
-									<option>David Samuel</option>
-								</SelectField>
-							</div> */}
 						</div>
 
+						{/* STEP 2 */}
 						<div className={`step2 questionnaire ${step !== 2 && 'hidden'}`}>
 							<h3 className='heading text-xl font-semibold mb-8 uppercase'>Questionnaire</h3>
 
@@ -267,11 +267,21 @@ const EditSurvey = () => {
 				</div>
 			</div>
 
+			<AutoSaveButton action={onFormSubmit} loading={loadingAPI} />
+
 			{openCatModal.open && (
 				<CategoryModal
 					openModal={openCatModal}
 					setOpenModal={setOpenCatModal}
 					setCategories={setCategories}
+				/>
+			)}
+
+			{openSModal && (
+				<ShareModal
+					openModal={openSModal}
+					setOpenModal={setOpenSModal}
+					link={window.location.origin + '/customer/survey' + surveyId}
 				/>
 			)}
 		</Layout>

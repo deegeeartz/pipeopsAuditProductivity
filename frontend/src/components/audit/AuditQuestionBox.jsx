@@ -7,10 +7,9 @@ const AuditQuestionBox = ({ id, question, handleInputChange, responses, setFileM
 	const fileData = typeof response?.files === 'string' ? JSON.parse(response?.files) : response?.files;
 	const optionsData = typeof question?.options === 'string' ? JSON.parse(question.options) : question.options;
 
-	// console.log(response.answer, fileData);
 	const showFileModal = () => {
-		console.log(response);
-		setFileModal({ open: true, data: response });
+		// console.log(response);
+		setFileModal({ open: true, data: { ...response, index: id, category: question.category.title } });
 	};
 
 	return (
@@ -63,8 +62,10 @@ const AuditQuestionBox = ({ id, question, handleInputChange, responses, setFileM
 						onChange={(e) => handleInputChange(question.id, 'skip', e.target.checked)}
 						disabled={view}
 					/>
-					<label htmlFor={'skip_' + question.id} className='ms-2 text-sm font-medium text-gray-900'>
-						N/A
+					<label
+						htmlFor={'skip_' + question.id}
+						className='ms-2 text-sm font-medium text-gray-900 lg:whitespace-nowrap'>
+						In Progress
 					</label>
 				</div>
 

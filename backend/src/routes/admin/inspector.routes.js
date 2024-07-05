@@ -4,6 +4,8 @@ const inspectorController = require('../../controllers/admin/inspector.controlle
 
 router.get('/', inspectorController.getAllRecords);
 
+router.get('/list', inspectorController.getAllInspectors);
+
 router.get('/:id', inspectorController.getRecordById);
 
 router.post('/', inspectorController.createRecord);

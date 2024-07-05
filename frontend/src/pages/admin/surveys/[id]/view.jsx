@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Layout from '@/components/layout/DashboardLayout';
-import { RiArrowLeftLine, RiUpload2Line } from 'react-icons/ri';
+import { RiArrowLeftLine, RiShare2Line, RiUpload2Line } from 'react-icons/ri';
 import Link from 'next/link';
 import { Accordion, Badge } from 'flowbite-react';
 import { FloatField } from '@/components/Fields';
@@ -10,12 +10,14 @@ import { Loader } from '@/components/Loader';
 import { errorHandler } from '@/utils/errorHandler';
 import http from '@/config/axios';
 import { useRouter } from 'next/router';
+import { ShareModal } from '@/components/survey/ShareModal';
 
 const ViewSurvey = () => {
 	const router = useRouter();
 	const { id: surveyId } = router.query;
 	const [step, setStep] = useState(1);
 	const [openCatModal, setOpenCatModal] = useState({ open: false });
+	const [openSModal, setOpenSModal] = useState(false);
 	const [categories, setCategories] = useState([]);
 	const [formData, setFormData] = useState({});
 	const [questions, setQuestions] = useState([]);
@@ -56,23 +58,16 @@ const ViewSurvey = () => {
 		step == 1 ? setStep(2) : setStep(1);
 	};
 
-	const removeQuestion = (id) => {
-		setQuestions(questions.filter((item) => item.id !== id));
-	};
-
-	const formatDateForInput = (dateString) => {
-		return dateString ? new Date(dateString).toISOString().split('T')[0] : '';
-	};
-
 	return (
 		<Layout>
 			<div className='content p-6'>
 				<div className='mb-7 flex justify-between items-center'>
 					<h1 className='font-bold text-lg text-[#222]'>Edit Survey</h1>
-					<Link href='/admin/surveys' className='btn_primary _flex'>
-						<RiArrowLeftLine className='mr-2 h-5 w-5' />
-						<span className='hidden md:block'>All Surveys</span>
-					</Link>
+
+					<div onClick={() => setOpenSModal(true)} className='btn_primary _flex cursor-pointer mr-3'>
+						<RiShare2Line className='mr-2 h-5 w-5' />
+						<span className='hidden md:block'>Share</span>
+					</div>
 				</div>
 
 				<div className='py-7 px-5 mb-8 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
@@ -80,25 +75,25 @@ const ViewSurvey = () => {
 						<div className={`step1 details ${step !== 1 && 'hidden'}`}>
 							<h3 className='heading text-xl font-semibold mb-8 uppercase'>Survey Details</h3>
 							<div className='mb-5'>
-								<FloatField label={'Client'} value={formData.clientName || ''} readOnly />
+								<FloatField label={'Client'} value={formData.clientName || '---'} readOnly />
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Hotel Name'} value={formData.hotelName || ''} readOnly />
+								<FloatField label={'Hotel Name'} value={formData.hotelName || '---'} readOnly />
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Campaign'} value={formData.campaign || ''} readOnly />
+								<FloatField label={'Campaign'} value={formData.campaign || '---'} readOnly />
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Location'} value={formData.location || ''} readOnly />
+								<FloatField label={'Location'} value={formData.location || '---'} readOnly />
 							</div>
 
 							<div className='mb-5'>
 								<FloatField
 									label={'Start Date'}
-									value={formData.startDate ? new Date(formData.startDate).toDateString() : ''}
+									value={formData.startDate ? new Date(formData.startDate).toDateString() : '---'}
 									readOnly
 								/>
 							</div>
@@ -106,18 +101,10 @@ const ViewSurvey = () => {
 							<div className='mb-5'>
 								<FloatField
 									label={'End Date'}
-									value={formData.endDate ? new Date(formData.endDate).toDateString() : ''}
+									value={formData.endDate ? new Date(formData.endDate).toDateString() : '---'}
 									readOnly
 								/>
 							</div>
-
-							{/* <div className='mb-5'>
-								<SelectField label={'Assign Inspector'}>
-									<option>select inspector</option>
-									<option>Paul Smith</option>
-									<option>David Samuel</option>
-								</SelectField>
-							</div> */}
 						</div>
 
 						<div className={`step2 questionnaire ${step !== 2 && 'hidden'}`}>
@@ -162,6 +149,14 @@ const ViewSurvey = () => {
 					openModal={openCatModal}
 					setOpenModal={setOpenCatModal}
 					setCategories={setCategories}
+				/>
+			)}
+
+			{openSModal && (
+				<ShareModal
+					openModal={openSModal}
+					setOpenModal={setOpenSModal}
+					link={window.location.origin + '/customer/survey' + surveyId}
 				/>
 			)}
 		</Layout>

@@ -23,7 +23,7 @@ const ClientAudits = () => {
 			const res = await http.get('/audit/client');
 
 			if (res?.status == 200) {
-				console.log('fetchData:', res.data);
+				// console.log('fetchData:', res.data);
 				setData(res.data.result);
 			}
 		} catch (error) {
@@ -66,18 +66,18 @@ const ClientAudits = () => {
 			minWidth: true,
 			minWidth: '120px',
 		},
-		{
-			name: 'Campaign',
-			selector: (row) => row.survey.campaign,
-			sortable: true,
-			minWidth: '120px',
-			hide: 'md',
-		},
+		// {
+		// 	name: 'Campaign',
+		// 	selector: (row) => row.survey.campaign,
+		// 	sortable: true,
+		// 	minWidth: '120px',
+		// 	hide: 'md',
+		// },
 		{
 			name: 'Detailed Summary',
 			selector: (row) => (
-				<Badge color={row.detailedSummary ? 'success' : 'warning'} className='cursor-pointer'>
-					{row.detailedSummary ? 'Done' : 'N/A '}
+				<Badge color={row.detailedSummary ? 'success' : 'gray'} className='cursor-pointer'>
+					{row.detailedSummary ? 'Filled' : 'N/A '}
 				</Badge>
 			),
 			sortable: true,
@@ -89,7 +89,7 @@ const ClientAudits = () => {
 			cell: (row) => {
 				return (
 					<Badge
-						color={row.status == 'completed' ? 'success' : 'warning'}
+						color={row.status == 'completed' ? 'success' : row.status == 'abandoned' ? 'failure' : 'warning'}
 						className='cursor-pointer capitalize'>
 						{row.status || 'in progress'}
 					</Badge>

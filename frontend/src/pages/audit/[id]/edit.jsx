@@ -12,8 +12,11 @@ import { useRouter } from 'next/router';
 import AuditQuestionBox from '@/components/audit/AuditQuestionBox';
 import SummaryTextField from '@/components/audit/SummaryTextField';
 import { FileModal } from '@/components/audit/FileModal';
+import { UploadsModal } from '@/components/UploadsModal';
 import Script from 'next/script';
 import { useAuth } from '@/context/AuthProvider';
+import { AutoSaveButton } from '@/components/common/AutoSaveButton';
+import { UploadFileButton } from '@/components/common/UploadFileButton';
 
 const EditAudit = () => {
 	const router = useRouter();
@@ -27,16 +30,19 @@ const EditAudit = () => {
 	const [isLoading, setLoading] = useState(true);
 	const [httpLoading, setHttpLoading] = useState(true);
 	const [fileModal, setFileModal] = useState({ open: false, data: {} });
+	const [loadingAPI, setLoadingAPI] = useState(false);
+	const [uploads, setUploads] = useState({});
+	const [uploadModal, setUploadModal] = useState({ open: false, data: {} });
 
 	const fetchData = async () => {
 		try {
 			const { data, status } = await http.get('/audit/' + auditId);
 
 			if (status == 200) {
-				console.log(data.result);
+				// console.log(data.result);
 
 				// Authorization
-				if (user.id !== data.result.inspector.userId) {
+				if (user?.id !== data.result.inspector.userId) {
 					router.push(`/${user.role.toLowerCase()}`);
 					return;
 				} else {
@@ -46,6 +52,7 @@ const EditAudit = () => {
 				setFormData(data.result);
 				setSurvey(data.result.survey);
 				setCategories(data.result.categories);
+				setUploads(data.result.uploads);
 
 				const defaultResponses = data.result.survey.questions.map((ques) => {
 					const existingResponse = data.result.responses.find((response) => response.questionId === ques.id);
@@ -64,6 +71,7 @@ const EditAudit = () => {
 			}
 		} catch (error) {
 			errorHandler(error);
+			if (error?.response?.status == 404) router.push('/inspector');
 		} finally {
 			setLoading(false);
 		}
@@ -73,6 +81,7 @@ const EditAudit = () => {
 		if (auditId) {
 			fetchData();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [auditId]);
 
 	if (isLoading || httpLoading) {
@@ -84,9 +93,7 @@ const EditAudit = () => {
 	}
 
 	const nextStep = () => {
-		console.log('audit: ', formData);
-		console.log('questions: ', survey.questions);
-		console.log('responses: ', responses);
+		// console.log('audit: ', formData);
 
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 		step == 1 ? setStep(2) : setStep(1);
@@ -105,17 +112,21 @@ const EditAudit = () => {
 
 	const onFormSubmit = async (el) => {
 		el.preventDefault();
+		setLoadingAPI(true);
 
 		const payload = {
-			expense: formData?.expense,
-			brandStandard: formData?.brandStandard,
-			executiveSummary: formData?.executiveSummary,
-			detailedSummary: formData?.detailedSummary,
-			scenario: formData?.scenario,
+			expense: formData?.expense || '',
+			brandStandard: formData?.brandStandard || '',
+			executiveSummary: formData?.executiveSummary || '',
+			detailedSummary: formData?.detailedSummary || '',
+			scenario: formData?.scenario || '',
 			status: formData?.status || 'in progress',
 			surveyId: survey.id,
+			uploads,
 			responses,
 		};
+
+		// return console.log(payload);
 
 		try {
 			const res = await http.put(`/audit/${auditId}`, payload);
@@ -124,6 +135,8 @@ const EditAudit = () => {
 			}
 		} catch (error) {
 			errorHandler(error);
+		} finally {
+			setLoadingAPI(false);
 		}
 	};
 
@@ -218,6 +231,22 @@ const EditAudit = () => {
 							<Accordion>
 								<Accordion.Panel className='box'>
 									<CategoryPanel title={'Brand Standard'} summaryField={formData?.brandStandard || ''}>
+										<div className='_flex mb-3'>
+											<UploadFileButton
+												files={uploads?.brandStandard}
+												onClick={() => {
+													setUploadModal({
+														open: true,
+														data: {
+															id: 'brandStandard',
+															title: 'Brand Standard',
+															files: uploads?.brandStandard,
+														},
+													});
+												}}
+											/>
+										</div>
+
 										<SummaryTextField
 											value={formData?.brandStandard || ''}
 											onChange={(el) => setFormData({ ...formData, brandStandard: el.target.value })}
@@ -227,6 +256,22 @@ const EditAudit = () => {
 
 								<Accordion.Panel className='box'>
 									<CategoryPanel title={'Executive Summary'} summaryField={formData?.executiveSummary || ''}>
+										<div className='_flex mb-3'>
+											<UploadFileButton
+												files={uploads?.executiveSummary}
+												onClick={() => {
+													setUploadModal({
+														open: true,
+														data: {
+															id: 'executiveSummary',
+															title: 'Executive Summary',
+															files: uploads?.executiveSummary,
+														},
+													});
+												}}
+											/>
+										</div>
+
 										<SummaryTextField
 											value={formData?.executiveSummary || ''}
 											onChange={(el) => setFormData({ ...formData, executiveSummary: el.target.value })}
@@ -236,6 +281,22 @@ const EditAudit = () => {
 
 								<Accordion.Panel className='box'>
 									<CategoryPanel title={'Detailed Summary'} summaryField={formData?.detailedSummary || ''}>
+										<div className='_flex mb-3'>
+											<UploadFileButton
+												files={uploads?.detailedSummary}
+												onClick={() => {
+													setUploadModal({
+														open: true,
+														data: {
+															id: 'detailedSummary',
+															title: 'Detailed Summary',
+															files: uploads?.detailedSummary,
+														},
+													});
+												}}
+											/>
+										</div>
+
 										<SummaryTextField
 											value={formData?.detailedSummary || ''}
 											onChange={(el) => setFormData({ ...formData, detailedSummary: el.target.value })}
@@ -245,6 +306,22 @@ const EditAudit = () => {
 
 								<Accordion.Panel className='box'>
 									<CategoryPanel title={'Scenario'} summaryField={formData?.scenario || ''}>
+										<div className='_flex mb-3'>
+											<UploadFileButton
+												files={uploads?.scenario}
+												onClick={() => {
+													setUploadModal({
+														open: true,
+														data: {
+															id: 'scenario',
+															title: 'Scenario',
+															files: uploads?.scenario,
+														},
+													});
+												}}
+											/>
+										</div>
+
 										<SummaryTextField
 											value={formData?.scenario || ''}
 											onChange={(el) => setFormData({ ...formData, scenario: el.target.value })}
@@ -254,6 +331,22 @@ const EditAudit = () => {
 
 								<Accordion.Panel className='box'>
 									<CategoryPanel title={'Expense'} summaryField={formData?.expense || ''}>
+										<div className='_flex mb-3'>
+											<UploadFileButton
+												files={uploads?.expense}
+												onClick={() => {
+													setUploadModal({
+														open: true,
+														data: {
+															id: 'expense',
+															title: 'Expense',
+															files: uploads?.expense,
+														},
+													});
+												}}
+											/>
+										</div>
+
 										<SummaryTextField
 											value={formData?.expense || ''}
 											onChange={(el) => setFormData({ ...formData, expense: el.target.value })}
@@ -273,6 +366,7 @@ const EditAudit = () => {
 								>
 									<option value={'in progress'}>In progress</option>
 									<option value={'completed'}>Completed</option>
+									<option value={'abandoned'}>Abandoned</option>
 								</select>
 							</div>
 						</div>
@@ -293,8 +387,24 @@ const EditAudit = () => {
 				</div>
 			</div>
 
+			<AutoSaveButton action={onFormSubmit} loading={loadingAPI} />
+
 			{fileModal.open && (
-				<FileModal openModal={fileModal} setOpenModal={setFileModal} handleInputChange={handleInputChange} />
+				<FileModal
+					openModal={fileModal}
+					setOpenModal={setFileModal}
+					handleInputChange={handleInputChange}
+					audit={formData}
+				/>
+			)}
+
+			{uploadModal.open && (
+				<UploadsModal
+					openModal={uploadModal}
+					setOpenModal={setUploadModal}
+					updateState={setUploads}
+					audit={formData}
+				/>
 			)}
 		</Layout>
 	);

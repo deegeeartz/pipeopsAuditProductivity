@@ -17,8 +17,9 @@ import Script from 'next/script';
 import { LoaderOverlay } from '../../../components/common/LoaderOverlay';
 import { UploadsModal } from '@/components/UploadsModal';
 import { UploadFileButton } from '@/components/common/UploadFileButton';
+import axios from 'axios';
 
-const StartAudit = () => {
+const CustomerAudit = () => {
 	const router = useRouter();
 	const { id: surveyId } = router.query;
 	const [step, setStep] = useState(1);
@@ -33,7 +34,7 @@ const StartAudit = () => {
 
 	const fetchData = async () => {
 		try {
-			const survey = await http.get('/inspector_survey/' + surveyId);
+			const survey = await axios.get(process.env.NEXT_PUBLIC_API_URL + '/customer/survey/' + surveyId);
 
 			if (survey?.status == 200) {
 				// console.log(survey.data.result);
@@ -51,8 +52,9 @@ const StartAudit = () => {
 				);
 			}
 		} catch (error) {
-			errorHandler(error);
-			if (error?.response?.status == 404) router.push('/inspector');
+			console.log(error);
+			const errorMessage = error?.response?.data?.error || 'An error occurred! Please try again. ';
+			toast.error(errorMessage);
 		} finally {
 			setLoading(false);
 		}
@@ -107,22 +109,42 @@ const StartAudit = () => {
 		};
 
 		try {
-			const { status, data } = await http.post('/audit', payload);
+			const { status, data } = await axios.post(process.env.NEXT_PUBLIC_API_URL + '/customer/audit', payload);
 			if (status == 201) {
-				const { id } = data.result;
+				// const { id } = data.result;
 				toast.success(data.message);
-				router.push(`/audit/${id}/edit`); // http://localhost:3000/audit/1/edit
+				router.push(`/customer/thankyou`);
 			}
 		} catch (error) {
-			errorHandler(error);
+			console.log(error);
+			const errorMessage = error?.response?.data?.error || 'An error occurred! Please try again. ';
+			toast.error(errorMessage);
 			setLoadingRequest(false);
 		}
 	};
 
 	return (
-		<>
-			{loadingRequest && <LoaderOverlay />}
-			<Layout>
+		<main className={`w-full bg-gray-100 min-h-screen transition-all main`}>
+			{/* HEADER */}
+			<div className='py-4 px-6 bg-[#fff] flex items-center shadow-md shadow-black/5 sticky top-0 left-0 z-30'>
+				<Link href='/' className='flex items-center'>
+					<img src='/logo.png' alt='Logo' className='w-[90px] mx-auto' />
+				</Link>
+
+				<ul className='ml-auto flex items-center'>
+					<button
+						id='fullscreen-button'
+						className='hover:bg-gray-100 p-1 rounded-full'
+						onClick={toggleFullscreen}>
+						<svg xmlns='http://www.w3.org/2000/svg' width={24} height={24} viewBox='0 0 24 24'>
+							<path d='M5 5h5V3H3v7h2zm5 14H5v-5H3v7h7zm11-5h-2v5h-5v2h7zm-2-4h2V3h-7v2h5z' />
+						</svg>
+					</button>
+				</ul>
+			</div>
+
+			<div className='container mx-auto max-w-screen-lg'>
+				{loadingRequest && <LoaderOverlay />}
 				<Script src='https://upload-widget.cloudinary.com/global/all.js' type='text/javascript'></Script>
 
 				<div className='content p-6'>
@@ -141,12 +163,14 @@ const StartAudit = () => {
 								</div>
 
 								<div className='mb-5'>
-									<FloatField label={'Hotel Name'} value={formData.hotelName || ''} readOnly />
+									<FloatField label={'Brand Name'} value={formData.hotelName || ''} readOnly />
 								</div>
 
-								<div className='mb-5'>
-									<FloatField label={'Campaign'} value={formData.campaign || ''} readOnly />
-								</div>
+								{formData.campaign && (
+									<div className='mb-5'>
+										<FloatField label={'Campaign'} value={formData.campaign || ''} readOnly />
+									</div>
+								)}
 
 								<div className='mb-5'>
 									<FloatField label={'Location'} value={formData.location || ''} readOnly />
@@ -390,9 +414,19 @@ const StartAudit = () => {
 						survey={formData}
 					/>
 				)}
-			</Layout>
-		</>
+			</div>
+		</main>
 	);
 };
 
-export default StartAudit;
+function toggleFullscreen() {
+	if (document.fullscreenElement) {
+		// If already in fullscreen, exit fullscreen
+		document.exitFullscreen();
+	} else {
+		// If not in fullscreen, request fullscreen
+		document.documentElement.requestFullscreen();
+	}
+}
+
+export default CustomerAudit;

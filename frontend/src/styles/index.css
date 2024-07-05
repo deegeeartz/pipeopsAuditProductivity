@@ -116,6 +116,30 @@ form.readOnly select {
 	width: 100%;
 }
 
+.suggestions {
+	position: absolute;
+	top: 50px;
+	left: 0px;
+	z-index: 999;
+	cursor: pointer;
+	width: 100%;
+	max-height: 200px;
+	overflow: auto;
+	background: #fff;
+	z-index: 999;
+
+	@apply shadow-xl border border-gray-200 rounded-md;
+}
+
+.suggestions > div {
+	padding: 9px 18px;
+	font-size: 15px;
+	/* border-bottom: 1px solid #bbb; */
+	transition: all 0.1s ease;
+
+	@apply border-b border-gray-100;
+}
+
 /*!----- MEDIA QUERIES -------*/
 @media (min-width: 1280px) {
 	/* .container {

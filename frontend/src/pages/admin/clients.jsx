@@ -8,8 +8,9 @@ import { errorHandler } from '@/utils/errorHandler';
 import { Label, Modal, TextInput } from 'flowbite-react';
 import dynamic from 'next/dynamic';
 import { useForm } from 'react-hook-form';
-import { RiAddFill, RiDeleteBin4Fill, RiEdit2Fill, RiSearch2Line } from 'react-icons/ri';
+import { RiAddFill, RiDeleteBin4Fill, RiEdit2Fill } from 'react-icons/ri';
 import { toast } from 'react-toastify';
+import { LocationSuggestionInput1 } from '@/components/form/LocationSuggestionField';
 
 const DataTableX = dynamic(() => import('@/components/DataTableX'), { ssr: false, loading: Loader });
 
@@ -24,7 +25,7 @@ const Clients = () => {
 		try {
 			const res = await http.get('/client');
 			if (res?.status == 200) {
-				console.log('fetchData:', res.data);
+				// console.log('fetchData:', res.data);
 				setData(res.data.result);
 			}
 		} catch (error) {
@@ -76,7 +77,7 @@ const Clients = () => {
 			name: 'Location',
 			selector: (row) => row.location,
 			sortable: true,
-			minWidth: '160px',
+			minWidth: '180px',
 		},
 		{
 			name: 'Additional Notes',
@@ -232,13 +233,9 @@ const Clients = () => {
 };
 
 function CustomModal({ openModal, setOpenModal, createOrUpdateRecord }) {
-	const { register, handleSubmit, watch } = useForm();
+	const { register, handleSubmit, setValue } = useForm();
 	const isEdit = openModal.type === 'edit';
 	const data = openModal.data;
-
-	useEffect(() => {
-		console.log(data);
-	}, []);
 
 	const action = (data) => {
 		createOrUpdateRecord(data);
@@ -287,7 +284,12 @@ function CustomModal({ openModal, setOpenModal, createOrUpdateRecord }) {
 							<div className='mb-1 block'>
 								<Label htmlFor='location' value='Location' />
 							</div>
-							<TextInput id='location' defaultValue={data?.location || ''} {...register('location')} />
+							<LocationSuggestionInput1
+								id='location'
+								value={data?.location || ''}
+								register={register}
+								setValue={setValue}
+							/>
 						</div>
 
 						<div>

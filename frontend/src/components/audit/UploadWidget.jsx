@@ -6,11 +6,14 @@ const UploadWidget = ({ file, setFile }) => {
 	const widgetRef = useRef();
 
 	useEffect(() => {
+		let fileName = `${file.name}_${Date.now()}`;
+
 		cloudinaryRef.current = window.cloudinary;
 		widgetRef.current = cloudinaryRef.current.createUploadWidget(
 			{
-				cloudName: 'dp8dycfcb',
-				uploadPreset: 'audit24',
+				cloudName: process.env.NEXT_PUBLIC_CLOUDNAME,
+				uploadPreset: process.env.NEXT_PUBLIC_UPLOADPRESET,
+				public_id: fileName.replace(' ', '_'),
 			},
 			function (error, result) {
 				// Handle the result or error here
@@ -21,7 +24,6 @@ const UploadWidget = ({ file, setFile }) => {
 						...prev,
 						url: result.info.url,
 						public_id: result.info.public_id,
-						asset_id: result.info.asset_id,
 					}));
 				}
 			}

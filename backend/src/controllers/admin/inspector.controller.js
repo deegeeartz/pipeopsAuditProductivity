@@ -47,6 +47,23 @@ const getAllRecords = async (req, res) => {
 	}
 };
 
+const getAllInspectors = async (req, res) => {
+	try {
+		const result = await prisma.inspector.findMany({
+			select: {
+				location: true,
+				user: { select: { id: true, name: true } },
+			},
+			orderBy,
+		});
+		// Return response
+		res.status(200).json({ result });
+	} catch (error) {
+		console.error('Error fetching data:', error);
+		res.status(500).json({ error: 'An error occurred!' });
+	}
+};
+
 const getRecordById = async (req, res) => {
 	try {
 		const { id } = req.params;
@@ -176,4 +193,5 @@ module.exports = {
 	createRecord,
 	updateRecord,
 	deleteRecord,
+	getAllInspectors,
 };
