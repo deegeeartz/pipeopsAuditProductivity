@@ -66,13 +66,13 @@ const ClientAudits = () => {
 			minWidth: true,
 			minWidth: '120px',
 		},
-		{
-			name: 'Campaign',
-			selector: (row) => row.survey.campaign,
-			sortable: true,
-			minWidth: '120px',
-			hide: 'md',
-		},
+		// {
+		// 	name: 'Campaign',
+		// 	selector: (row) => row.survey.campaign,
+		// 	sortable: true,
+		// 	minWidth: '120px',
+		// 	hide: 'md',
+		// },
 		{
 			name: 'Detailed Summary',
 			selector: (row) => (

@@ -42,12 +42,12 @@ const SurveyTable = ({ data, setOpenDelModal, setEntryModal }) => {
 			minWidth: true,
 			minWidth: '120px',
 		},
-		{
-			name: 'Campaign',
-			selector: (row) => row.campaign,
-			sortable: true,
-			minWidth: '120px',
-		},
+		// {
+		// 	name: 'Campaign',
+		// 	selector: (row) => row.campaign,
+		// 	sortable: true,
+		// 	minWidth: '120px',
+		// },
 		{
 			name: 'Location',
 			selector: (row) => row.location,
