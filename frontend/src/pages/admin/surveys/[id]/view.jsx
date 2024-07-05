@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Layout from '@/components/layout/DashboardLayout';
-import { RiArrowLeftLine, RiUpload2Line } from 'react-icons/ri';
+import { RiArrowLeftLine, RiShare2Line, RiUpload2Line } from 'react-icons/ri';
 import Link from 'next/link';
 import { Accordion, Badge } from 'flowbite-react';
 import { FloatField } from '@/components/Fields';
@@ -10,12 +10,14 @@ import { Loader } from '@/components/Loader';
 import { errorHandler } from '@/utils/errorHandler';
 import http from '@/config/axios';
 import { useRouter } from 'next/router';
+import { ShareModal } from '@/components/survey/ShareModal';
 
 const ViewSurvey = () => {
 	const router = useRouter();
 	const { id: surveyId } = router.query;
 	const [step, setStep] = useState(1);
 	const [openCatModal, setOpenCatModal] = useState({ open: false });
+	const [openSModal, setOpenSModal] = useState(false);
 	const [categories, setCategories] = useState([]);
 	const [formData, setFormData] = useState({});
 	const [questions, setQuestions] = useState([]);
@@ -61,10 +63,11 @@ const ViewSurvey = () => {
 			<div className='content p-6'>
 				<div className='mb-7 flex justify-between items-center'>
 					<h1 className='font-bold text-lg text-[#222]'>Edit Survey</h1>
-					<Link href='/admin/surveys' className='btn_primary _flex'>
-						<RiArrowLeftLine className='mr-2 h-5 w-5' />
-						<span className='hidden md:block'>All Surveys</span>
-					</Link>
+
+					<div onClick={() => setOpenSModal(true)} className='btn_primary _flex cursor-pointer mr-3'>
+						<RiShare2Line className='mr-2 h-5 w-5' />
+						<span className='hidden md:block'>Share</span>
+					</div>
 				</div>
 
 				<div className='py-7 px-5 mb-8 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
@@ -146,6 +149,14 @@ const ViewSurvey = () => {
 					openModal={openCatModal}
 					setOpenModal={setOpenCatModal}
 					setCategories={setCategories}
+				/>
+			)}
+
+			{openSModal && (
+				<ShareModal
+					openModal={openSModal}
+					setOpenModal={setOpenSModal}
+					link={'http://localhost:3000/customer/3'}
 				/>
 			)}
 		</Layout>
