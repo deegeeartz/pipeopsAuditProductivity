@@ -15,7 +15,7 @@ export const CategoryPanel = ({ title, count, filledCount, summaryField, childre
 		if (summaryField !== undefined) {
 			return (
 				<Badge color={summaryField.trim() ? 'success' : 'failure'} className='px-3 mr-2'>
-					{summaryField.trim() ? 'Done' : 'N/A'}
+					{summaryField.trim() ? 'Filled' : 'Incomplete'}
 				</Badge>
 			);
 		}

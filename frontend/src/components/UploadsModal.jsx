@@ -1,33 +1,33 @@
 import { Modal } from 'flowbite-react';
 import { useState } from 'react';
-import UploadWidget from './UploadWidget';
-import { FloatField } from '../Fields';
+import UploadWidget from './audit/UploadWidget';
+import { FloatField } from './Fields';
 import { RiDeleteBin4Fill } from 'react-icons/ri';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
 import http from '@/config/axios';
 
-export const FileModal = ({ openModal, setOpenModal, handleInputChange, audit, survey, viewOnly }) => {
+export const UploadsModal = ({ openModal, setOpenModal, updateState, audit, survey, viewOnly }) => {
 	const data = openModal.data;
-	const fileData = typeof data?.files === 'string' ? JSON.parse(data?.files) : data?.files;
-	const [files, setFiles] = useState(fileData || []);
+	const [files, setFiles] = useState(data?.files || []);
 
 	// Get file name based on the data
 	let fileName = `${data.category} Q${data.index}`;
-	if (audit?.id) fileName = `A${audit.id}_${audit.survey.hotelName}_${data.category}_Q${data.index}`;
-	if (survey?.id) fileName = `S${survey.id}_${survey.hotelName}_${data.category}_Q${data.index}`;
+	if (audit?.id) fileName = `A${audit.id}_${audit.survey.hotelName}_${data.id}`;
+	if (survey?.id) fileName = `S${survey.id}_${survey.hotelName}_${data.id}`;
 
 	const [newFile, setNewFile] = useState({
 		id: '',
-		desc: `${data.category} Q${data.index}`,
+		public_id: '',
+		desc: `${data.title}`,
 		name: fileName,
 		url: '',
-		auditId: data.auditId,
 	});
 
 	const action = (el) => {
 		el.preventDefault();
-		// console.log(files);
+		console.log(files);
+
 		if (!newFile.desc || !newFile.url) {
 			return toast.error('Description and file is required!');
 		}
@@ -35,7 +35,7 @@ export const FileModal = ({ openModal, setOpenModal, handleInputChange, audit, s
 		// Add to files list
 		const updatedFiles = [...files, { ...newFile, id: Date.now() }];
 		setFiles(updatedFiles);
-		handleInputChange(data.questionId, 'files', updatedFiles);
+		updateState((prev) => ({ ...prev, [data.id]: updatedFiles }));
 		// Reset
 		setNewFile({ id: '', desc: '', url: '' });
 	};
@@ -46,12 +46,15 @@ export const FileModal = ({ openModal, setOpenModal, handleInputChange, audit, s
 
 		const updatedFiles = files.filter((file) => file.public_id !== public_id);
 		setFiles(updatedFiles);
-		handleInputChange(data.questionId, 'files', updatedFiles);
+		updateState((prev) => ({ ...prev, [data.id]: updatedFiles }));
 	};
 
 	return (
 		<>
-			<Modal dismissible={viewOnly} show={openModal.open} onClose={() => setOpenModal({ open: false })}>
+			<Modal
+				dismissible={viewOnly && !data?.canEdit}
+				show={openModal.open}
+				onClose={() => setOpenModal({ open: false })}>
 				<Modal.Header>Upload file</Modal.Header>
 
 				<Modal.Body>
@@ -78,7 +81,7 @@ export const FileModal = ({ openModal, setOpenModal, handleInputChange, audit, s
 										View
 									</Link>
 
-									{!viewOnly && (
+									{(!viewOnly || data?.canEdit) && (
 										<div
 											className='btn_primary !py-[8px] w-fit cursor-pointer'
 											onClick={() => removeFile(file.public_id)}>
@@ -89,7 +92,7 @@ export const FileModal = ({ openModal, setOpenModal, handleInputChange, audit, s
 							))}
 						</div>
 
-						{!viewOnly && (
+						{(!viewOnly || data?.canEdit) && (
 							<div className='addNew md:flex gap-x-3'>
 								<div className='w-full mb-3 md:mb-[-6px]'>
 									<FloatField

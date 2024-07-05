@@ -9,10 +9,12 @@ import http from '@/config/axios';
 import { errorHandler } from '@/utils/errorHandler';
 import SearchBox from '@/components/SearchBox';
 import { Badge } from 'flowbite-react';
+import { useAuth } from '@/context/AuthProvider';
 
 const DataTableX = dynamic(() => import('@/components/DataTableX'), { ssr: false, loading: Loader });
 
 const InspectorSurveys = () => {
+	const { user } = useAuth();
 	const [data, setData] = useState([]);
 	const [isLoading, setLoading] = useState(true);
 	const [searchTerm, setSearchTerm] = useState('');
@@ -21,7 +23,7 @@ const InspectorSurveys = () => {
 		try {
 			const res = await http.get('/survey');
 			if (res?.status == 200) {
-				console.log(res.data);
+				// console.log(res.data);
 				setData(res.data.result);
 			}
 		} catch (error) {
@@ -43,15 +45,17 @@ const InspectorSurveys = () => {
 		);
 	}
 
-	const ActionButtons = ({ id }) => {
-		const style =
-			'text-[17px] cursor-pointer rounded-sm p-1 text-[#252525] border border-gray-300 hover:bg-gray-200 fx_center';
+	const ActionButtons = ({ data }) => {
+		const currentInspectorId = user?.inspector?.id;
+		const surveyFilled = data.audits.find((audit) => audit.inspectorId === currentInspectorId);
+		const linkURL = surveyFilled ? `/audit/${surveyFilled?.id}/edit` : `/audit/${data?.id}`;
+
 		return (
 			<div className='flex gap-x-4'>
-				<Link href={'/audit/' + id}>
+				<Link href={linkURL}>
 					<button className='btn_primary fx_center w-[100px] !p-1 !py-1.5'>
 						<RiPlayLine className='mr-1.5 h-[18px] w-[18px]' />
-						<span className='text-[13px]'>Start</span>
+						<span className='text-[13px]'>{surveyFilled ? 'Resume' : 'Start'}</span>
 					</button>
 				</Link>
 			</div>
@@ -83,7 +87,12 @@ const InspectorSurveys = () => {
 			selector: (row) => row.campaign,
 			sortable: true,
 			minWidth: '120px',
-			hide: 'md',
+		},
+		{
+			name: 'Location',
+			selector: (row) => row.location,
+			sortable: true,
+			minWidth: '120px',
 		},
 		{
 			name: 'Start Date',
@@ -98,21 +107,9 @@ const InspectorSurveys = () => {
 			minWidth: '125px',
 		},
 		{
-			name: 'Audits',
-			minWidth: '120px',
-			cell: (row) => {
-				const count = row?._count?.audits;
-				return (
-					<Badge color={count > 0 ? 'success' : 'failure'} className='cursor-pointer'>
-						{count} {count > 1 ? ' Entries' : ' Entry'}
-					</Badge>
-				);
-			},
-		},
-		{
 			name: 'Action',
 			minWidth: '150px',
-			cell: (row) => <ActionButtons id={row.id} />,
+			cell: (row) => <ActionButtons data={row} />,
 		},
 	];
 

@@ -14,6 +14,9 @@ import SummaryTextField from '@/components/audit/SummaryTextField';
 import { FileModal } from '@/components/audit/FileModal';
 import Script from 'next/script';
 import { useAuth } from '@/context/AuthProvider';
+import { AutoSaveButton } from '@/components/common/AutoSaveButton';
+import { UploadsModal } from '@/components/UploadsModal';
+import { UploadFileButton } from '@/components/common/UploadFileButton';
 
 const ViewAudit = () => {
 	const router = useRouter();
@@ -26,21 +29,26 @@ const ViewAudit = () => {
 	const [responses, setResponses] = useState([]);
 	const [isLoading, setLoading] = useState(true);
 	const [fileModal, setFileModal] = useState({ open: false, data: {} });
+	const [loadingAPI, setLoadingAPI] = useState(false);
+	const [uploads, setUploads] = useState({});
+	const [uploadModal, setUploadModal] = useState({ open: false, data: {} });
 
 	const fetchData = async () => {
 		try {
-			const res = await http.get('/audit/' + auditId);
+			const { status, data } = await http.get('/audit/' + auditId);
 
-			if (res?.status == 200) {
-				console.log(res.data.result);
+			if (status == 200) {
+				// console.log(data.result);
 
-				setFormData(res.data.result);
-				setResponses(res.data.result.responses);
-				setSurvey(res.data.result.survey);
-				setCategories(res.data.result.categories);
+				setFormData(data.result);
+				setResponses(data.result.responses);
+				setSurvey(data.result.survey);
+				setCategories(data.result.categories);
+				setUploads(data.result.uploads);
 			}
 		} catch (error) {
 			errorHandler(error);
+			if (error?.response?.status == 404) router.push(`/${user?.role?.toLowerCase()}`);
 		} finally {
 			setLoading(false);
 		}
@@ -61,7 +69,7 @@ const ViewAudit = () => {
 	}
 
 	const nextStep = () => {
-		console.log('audit: ', formData);
+		// console.log('audit: ', formData);
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 		step == 1 ? setStep(2) : setStep(1);
 	};
@@ -79,21 +87,28 @@ const ViewAudit = () => {
 
 	const onFormSubmit = async (el) => {
 		el.preventDefault();
+
 		const { feedback } = formData;
 
-		console.log('feedback', feedback);
 		if (!feedback?.trim()) {
 			return toast.error('Feedback field is required!');
 		}
 
-		const payload = { feedback: feedback?.trim() };
+		const payload = {
+			uploads: uploads?.feedback,
+			feedback: feedback?.trim(),
+		};
+
 		try {
+			setLoadingAPI(true);
 			const res = await http.patch(`/audit/${auditId}/feedback`, payload);
 			if (res?.status == 200) {
 				toast.success(res.data.message);
 			}
 		} catch (error) {
 			errorHandler(error);
+		} finally {
+			setLoadingAPI(false);
 		}
 	};
 
@@ -150,7 +165,7 @@ const ViewAudit = () => {
 							<h3 className='heading text-xl font-semibold mb-8 uppercase flex items-center'>
 								<span>Questionnaire</span>
 								<Badge color='dark' className='px-3 ml-4'>
-									{survey?.questions.length}
+									{survey?.questions?.length}
 								</Badge>
 							</h3>
 
@@ -189,30 +204,110 @@ const ViewAudit = () => {
 							<Accordion>
 								<Accordion.Panel className='box'>
 									<CategoryPanel title={'Brand Standard'} summaryField={formData?.brandStandard || ''}>
+										<div className='_flex mb-3'>
+											<UploadFileButton
+												files={uploads?.brandStandard}
+												onClick={() => {
+													setUploadModal({
+														open: true,
+														data: {
+															id: 'brandStandard',
+															title: 'Brand Standard',
+															files: uploads?.brandStandard,
+														},
+													});
+												}}
+											/>
+										</div>
+
 										<SummaryTextField value={formData?.brandStandard || ''} readOnly />
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
 									<CategoryPanel title={'Executive Summary'} summaryField={formData?.executiveSummary || ''}>
+										<div className='_flex mb-3'>
+											<UploadFileButton
+												files={uploads?.executiveSummary}
+												onClick={() => {
+													setUploadModal({
+														open: true,
+														data: {
+															id: 'executiveSummary',
+															title: 'Executive Summary',
+															files: uploads?.executiveSummary,
+														},
+													});
+												}}
+											/>
+										</div>
+
 										<SummaryTextField value={formData?.executiveSummary || ''} readOnly />
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
 									<CategoryPanel title={'Detailed Summary'} summaryField={formData?.detailedSummary || ''}>
+										<div className='_flex mb-3'>
+											<UploadFileButton
+												files={uploads?.detailedSummary}
+												onClick={() => {
+													setUploadModal({
+														open: true,
+														data: {
+															id: 'detailedSummary',
+															title: 'Detailed Summary',
+															files: uploads?.detailedSummary,
+														},
+													});
+												}}
+											/>
+										</div>
+
 										<SummaryTextField value={formData?.detailedSummary || ''} readOnly />
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
 									<CategoryPanel title={'Scenario'} summaryField={formData?.scenario || ''}>
+										<div className='_flex mb-3'>
+											<UploadFileButton
+												files={uploads?.scenario}
+												onClick={() => {
+													setUploadModal({
+														open: true,
+														data: {
+															id: 'scenario',
+															title: 'Scenario',
+															files: uploads?.scenario,
+														},
+													});
+												}}
+											/>
+										</div>
+
 										<SummaryTextField value={formData?.scenario || ''} readOnly />
 									</CategoryPanel>
 								</Accordion.Panel>
 
 								<Accordion.Panel className='box'>
 									<CategoryPanel title={'Expense'} summaryField={formData?.expense || ''}>
+										<div className='_flex mb-3'>
+											<UploadFileButton
+												files={uploads?.expense}
+												onClick={() => {
+													setUploadModal({
+														open: true,
+														data: {
+															id: 'expense',
+															title: 'Expense',
+															files: uploads?.expense,
+														},
+													});
+												}}
+											/>
+										</div>
+
 										<SummaryTextField value={formData?.expense || ''} readOnly />
 									</CategoryPanel>
 								</Accordion.Panel>
@@ -234,7 +329,23 @@ const ViewAudit = () => {
 							</div>
 
 							<div className='py-5 mt-4'>
-								<p className='text-[15px] font-medium pb-2'>Feedback</p>
+								<div className='fx_between mb-3'>
+									<p className='text-[15px] font-medium pb-2'>Feedback</p>
+									<UploadFileButton
+										files={uploads?.feedback}
+										onClick={() => {
+											setUploadModal({
+												open: true,
+												data: {
+													id: 'feedback',
+													title: 'Feedback',
+													files: uploads?.feedback,
+													canEdit: survey.clientId == user?.client?.id,
+												},
+											});
+										}}
+									/>
+								</div>
 
 								<SummaryTextField
 									value={formData?.feedback || ''}
@@ -260,12 +371,25 @@ const ViewAudit = () => {
 				</div>
 			</div>
 
+			{step == 2 && survey.clientId == user?.client?.id && (
+				<AutoSaveButton action={onFormSubmit} loading={loadingAPI} />
+			)}
+
 			{fileModal.open && (
 				<FileModal
 					openModal={fileModal}
 					setOpenModal={setFileModal}
 					handleInputChange={handleInputChange}
-					view={true}
+					viewOnly={true}
+				/>
+			)}
+
+			{uploadModal.open && (
+				<UploadsModal
+					openModal={uploadModal}
+					setOpenModal={setUploadModal}
+					updateState={setUploads}
+					viewOnly={true}
 				/>
 			)}
 		</Layout>

@@ -26,7 +26,7 @@ const Surveys = () => {
 		try {
 			const res = await http.get('/survey');
 			if (res?.status == 200) {
-				console.log(res.data);
+				// console.log(res.data);
 				setData(res.data.result);
 			}
 		} catch (error) {
@@ -124,7 +124,7 @@ const EntriesModal = ({ openModal, setOpenModal }) => {
 		try {
 			const res = await http.get('/audit/survey/' + surveyId);
 			if (res?.status == 200) {
-				console.log('audit', res.data);
+				// console.log('audit', res.data);
 				setAudits(res.data.result);
 			}
 		} catch (error) {
@@ -135,7 +135,6 @@ const EntriesModal = ({ openModal, setOpenModal }) => {
 	};
 
 	useEffect(() => {
-		console.log(survey);
 		fetchData();
 	}, []);
 
@@ -162,10 +161,10 @@ const EntriesModal = ({ openModal, setOpenModal }) => {
 
 										<div className='pt-2 pb-4 grid gap-1 md:flex flex-wrap justify-between items-center '>
 											<span className='pr-2'>
-												<b className='text-[14px]'>Inspector: </b> {audit.inspectorName}
+												<b className='text-[14px]'>Inspector: </b> {audit.inspectorName || 'N/A'}
 											</span>
 
-											<span className='pr-2'>
+											<span className='pr-2 capitalize'>
 												<b className='text-[14px]'>Status: </b> {audit.status}
 											</span>
 

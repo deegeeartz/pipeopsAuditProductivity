@@ -4,12 +4,13 @@ import { Loader } from '@/components/Loader';
 import SearchBox from '@/components/SearchBox';
 import http from '@/config/axios';
 import { errorHandler } from '@/utils/errorHandler';
-import { Label, Modal, TextInput } from 'flowbite-react';
+import { Label, Modal, Select, TextInput } from 'flowbite-react';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { RiAddFill, RiDeleteBin4Fill, RiEdit2Fill, RiSearch2Line } from 'react-icons/ri';
+import { RiAddFill, RiDeleteBin4Fill, RiEdit2Fill } from 'react-icons/ri';
 import { toast } from 'react-toastify';
+import { LocationSuggestionInput1 } from '../../components/form/LocationSuggestionField';
 
 const DataTableX = dynamic(() => import('@/components/DataTableX'), { ssr: false, loading: Loader });
 
@@ -24,7 +25,7 @@ const Inspectors = () => {
 		try {
 			const res = await http.get('/inspector');
 			if (res?.status == 200) {
-				console.log('fetchData:', res.data);
+				// console.log('fetchData:', res.data);
 				setData(res.data.result);
 			}
 		} catch (error) {
@@ -76,7 +77,7 @@ const Inspectors = () => {
 			name: 'Location',
 			selector: (row) => row.location,
 			sortable: true,
-			minWidth: '160px',
+			minWidth: '200px',
 		},
 		{
 			name: 'Language',
@@ -231,13 +232,9 @@ const Inspectors = () => {
 };
 
 function InspectorModal({ openModal, setOpenModal, createOrUpdateRecord }) {
-	const { register, handleSubmit, watch } = useForm();
+	const { register, handleSubmit, setValue } = useForm();
 	const isEdit = openModal.type === 'edit';
 	const data = openModal.data;
-
-	useEffect(() => {
-		console.log(data);
-	}, []);
 
 	const action = (data) => {
 		createOrUpdateRecord(data);
@@ -274,11 +271,11 @@ function InspectorModal({ openModal, setOpenModal, createOrUpdateRecord }) {
 							<div className='mb-1 block'>
 								<Label htmlFor='location' value='Location' />
 							</div>
-							<TextInput
+							<LocationSuggestionInput1
 								id='location'
-								defaultValue={data?.location || ''}
-								{...register('location')}
-								required
+								value={data?.location || ''}
+								register={register}
+								setValue={setValue}
 							/>
 						</div>
 
@@ -297,7 +294,19 @@ function InspectorModal({ openModal, setOpenModal, createOrUpdateRecord }) {
 							<div className='mb-1 block'>
 								<Label htmlFor='language' value='Language' />
 							</div>
-							<TextInput id='language' defaultValue={data?.language || ''} {...register('language')} />
+							<TextInput
+								id='language'
+								defaultValue={data?.language || ''}
+								{...register('language')}
+								list='language_list'
+								required
+							/>
+							<datalist id='language_list'>
+								{/* LANGUAGES */}
+								{LANGUAGES.map((name, index) => (
+									<option key={index}>{name}</option>
+								))}
+							</datalist>
 						</div>
 
 						<div>
@@ -322,5 +331,59 @@ function InspectorModal({ openModal, setOpenModal, createOrUpdateRecord }) {
 		</>
 	);
 }
+
+const LANGUAGES = [
+	'Akan',
+	'Amharic',
+	'Arabic',
+	'Bengali',
+	'Cantonese (Yue)',
+	'Chewa',
+	'English',
+	'Fula',
+	'French',
+	'German',
+	'Gujarati',
+	'Hausa',
+	'Hindi',
+	'Igbo',
+	'Indonesian (Malay)',
+	'Italian',
+	'Japanese',
+	'Javanese',
+	'Jin',
+	'Kannada',
+	'Kinyarwanda',
+	'Kirundi',
+	'Korean',
+	'Lingala',
+	'Malayalam',
+	'Mandarin Chinese',
+	'Marathi',
+	'Oromo',
+	'Pashto',
+	'Persian',
+	'Polish',
+	'Portuguese',
+	'Punjabi',
+	'Russian',
+	'Shanghainese (Wu)',
+	'Shona',
+	'Somali',
+	'Spanish',
+	'Sundanese',
+	'Swahili',
+	'Tamil',
+	'Telugu',
+	'Thai',
+	'Tigrinya',
+	'Turkish',
+	'Urdu',
+	'Vietnamese',
+	'Xiang',
+	'Yoruba',
+	'Zulu',
+	'Others',
+];
 
 export default Inspectors;
