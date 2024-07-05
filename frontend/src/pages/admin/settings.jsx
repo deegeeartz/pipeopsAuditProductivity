@@ -24,7 +24,7 @@ const Settings = () => {
 			try {
 				const res = await http.get('/category');
 				if (res?.status == 200) {
-					console.log(res.data);
+					// console.log(res.data);
 					setData(res.data.result);
 				}
 			} catch (error) {
@@ -102,6 +102,7 @@ const Settings = () => {
 			if (res?.status == 200) {
 				setData(res.data.result);
 				toast.success(res.data.message);
+				toast.info('Any associated questions were also deleted!');
 			}
 		} catch (error) {
 			errorHandler(error);

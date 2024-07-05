@@ -22,7 +22,7 @@ const InspectorAudits = () => {
 		try {
 			const res = await http.get('/audit/inspector');
 			if (res?.status == 200) {
-				console.log('fetchData:', res.data);
+				// console.log('fetchData:', res.data);
 				setData(res.data.result);
 			}
 		} catch (error) {
@@ -75,8 +75,8 @@ const InspectorAudits = () => {
 		{
 			name: 'Detailed Summary',
 			selector: (row) => (
-				<Badge color={row.detailedSummary ? 'success' : 'warning'} className='cursor-pointer'>
-					{row.detailedSummary ? 'Done' : 'N/A '}
+				<Badge color={row.detailedSummary ? 'success' : 'gray'} className='cursor-pointer'>
+					{row.detailedSummary ? 'Filled' : 'N/A '}
 				</Badge>
 			),
 			sortable: true,
@@ -88,7 +88,7 @@ const InspectorAudits = () => {
 			cell: (row) => {
 				return (
 					<Badge
-						color={row.status == 'completed' ? 'success' : 'warning'}
+						color={row.status == 'completed' ? 'success' : row.status == 'abandoned' ? 'failure' : 'warning'}
 						className='cursor-pointer capitalize'>
 						{row.status || 'in progress'}
 					</Badge>

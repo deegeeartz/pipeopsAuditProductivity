@@ -56,14 +56,6 @@ const ViewSurvey = () => {
 		step == 1 ? setStep(2) : setStep(1);
 	};
 
-	const removeQuestion = (id) => {
-		setQuestions(questions.filter((item) => item.id !== id));
-	};
-
-	const formatDateForInput = (dateString) => {
-		return dateString ? new Date(dateString).toISOString().split('T')[0] : '';
-	};
-
 	return (
 		<Layout>
 			<div className='content p-6'>
@@ -80,25 +72,25 @@ const ViewSurvey = () => {
 						<div className={`step1 details ${step !== 1 && 'hidden'}`}>
 							<h3 className='heading text-xl font-semibold mb-8 uppercase'>Survey Details</h3>
 							<div className='mb-5'>
-								<FloatField label={'Client'} value={formData.clientName || ''} readOnly />
+								<FloatField label={'Client'} value={formData.clientName || '---'} readOnly />
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Hotel Name'} value={formData.hotelName || ''} readOnly />
+								<FloatField label={'Hotel Name'} value={formData.hotelName || '---'} readOnly />
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Campaign'} value={formData.campaign || ''} readOnly />
+								<FloatField label={'Campaign'} value={formData.campaign || '---'} readOnly />
 							</div>
 
 							<div className='mb-5'>
-								<FloatField label={'Location'} value={formData.location || ''} readOnly />
+								<FloatField label={'Location'} value={formData.location || '---'} readOnly />
 							</div>
 
 							<div className='mb-5'>
 								<FloatField
 									label={'Start Date'}
-									value={formData.startDate ? new Date(formData.startDate).toDateString() : ''}
+									value={formData.startDate ? new Date(formData.startDate).toDateString() : '---'}
 									readOnly
 								/>
 							</div>
@@ -106,18 +98,10 @@ const ViewSurvey = () => {
 							<div className='mb-5'>
 								<FloatField
 									label={'End Date'}
-									value={formData.endDate ? new Date(formData.endDate).toDateString() : ''}
+									value={formData.endDate ? new Date(formData.endDate).toDateString() : '---'}
 									readOnly
 								/>
 							</div>
-
-							{/* <div className='mb-5'>
-								<SelectField label={'Assign Inspector'}>
-									<option>select inspector</option>
-									<option>Paul Smith</option>
-									<option>David Samuel</option>
-								</SelectField>
-							</div> */}
 						</div>
 
 						<div className={`step2 questionnaire ${step !== 2 && 'hidden'}`}>
