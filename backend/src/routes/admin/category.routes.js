@@ -27,6 +27,17 @@ router.get('/', async (req, res) => {
 	}
 });
 
+router.get('/list', async (req, res) => {
+	try {
+		const result = await prisma.category.findMany({ orderBy });
+		// Return response
+		res.status(200).json({ result });
+	} catch (error) {
+		console.error('Error fetching data:', error);
+		res.status(500).json({ error: 'An error occurred!' });
+	}
+});
+
 router.post('/', async (req, res) => {
 	try {
 		// Validation
@@ -90,7 +101,7 @@ router.delete('/:id', async (req, res) => {
 		const result = await prisma.category.findMany({ orderBy });
 		res.status(200).json({
 			result,
-			message: 'Category and any related questions has been deleted successfully! ',
+			message: 'Category deleted successfully! ',
 		});
 	} catch (error) {
 		const prismaError = handlePrismaError(error);

@@ -13,6 +13,7 @@ const schema = Joi.object({
 	scenario: Joi.string().allow(''),
 	status: Joi.string().allow(''),
 	responses: Joi.array(),
+	uploads: Joi.object(),
 	surveyId: Joi.number().required(),
 	// inspectorId: Joi.number().required(),
 });
@@ -146,15 +147,17 @@ const getSurveyAudits = async (req, res) => {
 const addFeedback = async (req, res) => {
 	try {
 		const { id: auditId } = req.params;
-		const { feedback } = req.body;
+		const { feedback, uploads } = req.body;
 
-		const audit = await prisma.audit.update({
+		const audit = await prisma.audit.findUnique({ where: { id: parseInt(auditId) } });
+		// Update feedback and uploads
+		const result = await prisma.audit.update({
 			where: { id: parseInt(auditId) },
-			data: { feedback },
+			data: { feedback, uploads: { ...audit.uploads, feedback: uploads } },
 		});
 
-		if (!audit) return res.status(404).json({ error: 'Audit not found!' });
-		res.status(200).json({ message: 'Feedback updated successfully!', audit });
+		if (!result) return res.status(404).json({ error: 'Audit not found!' });
+		res.status(200).json({ message: 'Feedback updated successfully!', result });
 	} catch (error) {
 		const prismaError = handlePrismaError(error);
 		res.status(prismaError.status).json(prismaError.response);
@@ -212,6 +215,7 @@ const createRecord = async (req, res) => {
 			status,
 			surveyId,
 			responses,
+			uploads,
 		} = value;
 
 		// Validate inspector existence
@@ -229,6 +233,7 @@ const createRecord = async (req, res) => {
 				status,
 				inspectorId: inspector.id,
 				surveyId,
+				uploads,
 				responses: {
 					create: responses.map((response) => ({
 						answer: response.answer,
@@ -262,6 +267,7 @@ const updateRecord = async (req, res) => {
 			scenario,
 			status,
 			surveyId,
+			uploads,
 			responses,
 		} = value;
 
@@ -275,6 +281,7 @@ const updateRecord = async (req, res) => {
 				scenario,
 				status,
 				surveyId,
+				uploads,
 				responses: {
 					deleteMany: { auditId: parseInt(id) },
 					create: responses.map((response) => ({

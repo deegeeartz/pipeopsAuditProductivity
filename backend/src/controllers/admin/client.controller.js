@@ -25,8 +25,6 @@ const getAllClients = async (req, res) => {
 			},
 			orderBy,
 		});
-
-		if (!result.length) return res.status(404).json({ error: 'No client found!' });
 		// Return response
 		res.status(200).json({ result });
 	} catch (error) {

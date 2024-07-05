@@ -39,12 +39,12 @@ model User {
 
 model Client {
   id     Int  @id @default(autoincrement())
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @unique
 
   hotelName       String
   location        String?
-  additionalNotes String?
+  additionalNotes String? @db.Text
   passcode        String?
 
   surveys Survey[]
@@ -52,7 +52,7 @@ model Client {
 
 model Inspector {
   id     Int  @id @default(autoincrement())
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @unique
 
   // Add additional fields specific to inspector users
@@ -75,14 +75,14 @@ model Survey {
   endDate    DateTime?
   inspectors Json?
   clientName String?
-  clientId   Int
+  clientId   Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relationships
   questions Question[]
-  client    Client     @relation(fields: [clientId], references: [id])
+  client    Client?    @relation(fields: [clientId], references: [id])
   audits    Audit[]
 }
 
@@ -101,21 +101,24 @@ model Question {
   surveyId   Int
 
   // Relationships
-  category  Category   @relation(fields: [categoryId], references: [id])
-  survey    Survey     @relation(fields: [surveyId], references: [id])
+  category  Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  survey    Survey     @relation(fields: [surveyId], references: [id], onDelete: Cascade)
   responses Response[]
 }
 
+// AUDIT
+
 model Audit {
   id               Int     @id @default(autoincrement())
-  expense          String?
-  brandStandard    String?
-  detailedSummary  String?
-  executiveSummary String?
-  scenario         String?
+  expense          String? @db.Text
+  brandStandard    String? @db.Text
+  detailedSummary  String? @db.Text
+  executiveSummary String? @db.Text
+  scenario         String? @db.Text
   status           String?
-  feedback         String?
-  inspectorId      Int
+  feedback         String? @db.Text
+  uploads          Json?
+  inspectorId      Int?
   surveyId         Int
 
   createdAt DateTime @default(now())
@@ -123,8 +126,8 @@ model Audit {
 
   // Relationships
   responses Response[]
-  inspector Inspector  @relation(fields: [inspectorId], references: [id])
-  survey    Survey     @relation(fields: [surveyId], references: [id])
+  inspector Inspector? @relation(fields: [inspectorId], references: [id])
+  survey    Survey     @relation(fields: [surveyId], references: [id], onDelete: Cascade)
 }
 
 model Response {
@@ -138,6 +141,6 @@ model Response {
   auditId      Int
 
   // Relationships
-  question Question @relation(fields: [questionId], references: [id])
-  audit    Audit    @relation(fields: [auditId], references: [id])
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  audit    Audit    @relation(fields: [auditId], references: [id], onDelete: Cascade)
 }
