@@ -156,7 +156,7 @@ const ViewSurvey = () => {
 				<ShareModal
 					openModal={openSModal}
 					setOpenModal={setOpenSModal}
-					link={'http://localhost:3000/customer/3'}
+					link={window.location.origin + '/customer/survey' + surveyId}
 				/>
 			)}
 		</Layout>

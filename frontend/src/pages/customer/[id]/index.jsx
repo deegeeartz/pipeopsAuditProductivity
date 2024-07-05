@@ -34,7 +34,7 @@ const CustomerAudit = () => {
 
 	const fetchData = async () => {
 		try {
-			const survey = await axios.get('/inspector_survey/' + surveyId);
+			const survey = await axios.get(process.env.NEXT_PUBLIC_API_URL + '/customer/survey/' + surveyId);
 
 			if (survey?.status == 200) {
 				// console.log(survey.data.result);
@@ -109,7 +109,7 @@ const CustomerAudit = () => {
 		};
 
 		try {
-			const { status, data } = await axios.post('/audit', payload);
+			const { status, data } = await axios.post(process.env.NEXT_PUBLIC_API_URL + '/customer/audit', payload);
 			if (status == 201) {
 				// const { id } = data.result;
 				toast.success(data.message);
@@ -163,12 +163,14 @@ const CustomerAudit = () => {
 								</div>
 
 								<div className='mb-5'>
-									<FloatField label={'Hotel Name'} value={formData.hotelName || ''} readOnly />
+									<FloatField label={'Brand Name'} value={formData.hotelName || ''} readOnly />
 								</div>
 
-								<div className='mb-5'>
-									<FloatField label={'Campaign'} value={formData.campaign || ''} readOnly />
-								</div>
+								{formData.campaign && (
+									<div className='mb-5'>
+										<FloatField label={'Campaign'} value={formData.campaign || ''} readOnly />
+									</div>
+								)}
 
 								<div className='mb-5'>
 									<FloatField label={'Location'} value={formData.location || ''} readOnly />

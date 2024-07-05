@@ -7,8 +7,8 @@ const fetchSuggestions = async (text, setSuggestions) => {
 	if (text.length > 3) {
 		try {
 			const query = encodeURIComponent(text);
-			const APIkey = process.env.TOMTOM_APIKEY;
-			const url = process.env.TOMTOM_URL + `/${query}.json?key=${APIkey}&limit=6`;
+			const APIkey = process.env.NEXT_PUBLIC_TOMTOM_APIKEY;
+			const url = process.env.NEXT_PUBLIC_TOMTOM_URL + `/${query}.json?key=${APIkey}&limit=6`;
 
 			const res = await axios.get(url);
 			if (res.data.results) {

@@ -14,7 +14,9 @@ const adminRoutes = require('./admin/index.routes');
 const auditRoutes = require('./audit.routes');
 const inspectorDashboard = require('./inspector/index.routes');
 const cloudinaryRoutes = require('./cloudinary.routes');
+const customerRoutes = require('./customer/index.routes');
 
+// Protected routes
 router.use('/auth', authRoutes);
 router.use('/category', auth, onlyAdmin, categoryRoutes);
 router.use('/client', auth, onlyAdmin, clientRoutes);
@@ -24,6 +26,9 @@ router.use('/admin', auth, adminRoutes);
 
 router.use('/audit', auth, auditRoutes);
 router.use('/cloudinary', auth, cloudinaryRoutes);
-router.use('/', auth, inspectorDashboard);
+router.use('/inspector_survey', auth, inspectorDashboard);
+
+// Public routes
+router.use('/customer', customerRoutes);
 
 module.exports = router;
