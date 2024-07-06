@@ -267,7 +267,7 @@ const EditSurvey = () => {
 				</div>
 			</div>
 
-			<AutoSaveButton action={onFormSubmit} loading={loadingAPI} />
+			{/* <AutoSaveButton action={onFormSubmit} loading={loadingAPI} /> */}
 
 			{openCatModal.open && (
 				<CategoryModal
@@ -281,7 +281,7 @@ const EditSurvey = () => {
 				<ShareModal
 					openModal={openSModal}
 					setOpenModal={setOpenSModal}
-					link={window.location.origin + '/customer/survey' + surveyId}
+					link={window.location.origin + '/customer/survey/' + surveyId}
 				/>
 			)}
 		</Layout>
