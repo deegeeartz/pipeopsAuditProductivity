@@ -14,7 +14,7 @@ import AuditQuestionBox from '@/components/audit/AuditQuestionBox';
 import SummaryTextField from '@/components/audit/SummaryTextField';
 import { FileModal } from '@/components/audit/FileModal';
 import Script from 'next/script';
-import { LoaderOverlay } from '../../../components/common/LoaderOverlay';
+import { LoaderOverlay } from '../../../../components/common/LoaderOverlay';
 import { UploadsModal } from '@/components/UploadsModal';
 import { UploadFileButton } from '@/components/common/UploadFileButton';
 import axios from 'axios';
