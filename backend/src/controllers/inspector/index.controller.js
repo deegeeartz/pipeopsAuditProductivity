@@ -6,27 +6,25 @@ const orderBy = { id: 'desc' };
 
 const getAllSurveys = async (req, res) => {
 	try {
-		let result;
 		const { search } = req.query;
-		const userId = req.user.id.toString();
-		const where = { inspectors: { array_contains: userId } };
+		let result;
 		const include = {
 			audits: { select: { id: true, inspectorId: true } },
-			_count: { select: { audits: true } },
+			_count: {
+				select: { questions: true, audits: true },
+			},
 		};
 
 		if (search) {
 			result = await prisma.survey.findMany({
-				where: { ...where, OR: [{ clientName: { contains: search } }, { hotelName: { contains: search } }] },
+				where: {
+					OR: [{ clientName: { contains: search } }, { hotelName: { contains: search } }],
+				},
 				include,
 				orderBy,
 			});
 		} else {
-			result = await prisma.survey.findMany({
-				where,
-				include,
-				orderBy,
-			});
+			result = await prisma.survey.findMany({ include, orderBy });
 			if (!result.length) return res.status(404).json({ error: 'No survey found!' });
 		}
 

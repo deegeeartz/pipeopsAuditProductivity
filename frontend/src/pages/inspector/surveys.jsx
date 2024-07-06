@@ -21,7 +21,7 @@ const InspectorSurveys = () => {
 
 	const fetchData = async () => {
 		try {
-			const res = await http.get('/survey');
+			const res = await http.get('/inspector_survey');
 			if (res?.status == 200) {
 				// console.log(res.data);
 				setData(res.data.result);
@@ -118,7 +118,7 @@ const InspectorSurveys = () => {
 		try {
 			// Limit the length of the search term to reduce api calls
 			if (keyword.length > 2) {
-				const res = await http.get(`/survey?search=${keyword}`);
+				const res = await http.get(`/inspector_survey?search=${keyword}`);
 				if (res?.status == 200) {
 					setData(res.data.result);
 				}
