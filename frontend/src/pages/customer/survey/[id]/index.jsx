@@ -149,7 +149,7 @@ const CustomerAudit = () => {
 
 				<div className='content p-6'>
 					<div className='mb-7 flex justify-between items-center'>
-						<h1 className='font-bold text-lg text-[#222]'>Survey #{surveyId}</h1>
+						{/* <h1 className='font-bold text-lg text-[#222]'>Survey #{surveyId}</h1> */}
 					</div>
 
 					<div className='py-7 px-5 mb-8 bg-white rounded-md border border-gray-200 shadow-sm shadow-black/5'>
@@ -389,7 +389,7 @@ const CustomerAudit = () => {
 								{step == 2 && (
 									<button type='submit' className='btn_primary _flex !px-[10px] !py-[10px] md:!px-[30px]'>
 										<RiAddFill size={22} className='mr-1.5' />
-										<span>Create Audit</span>
+										<span>Submit</span>
 									</button>
 								)}
 							</div>

@@ -65,7 +65,7 @@ const AuditQuestionBox = ({ id, question, handleInputChange, responses, setFileM
 					<label
 						htmlFor={'skip_' + question.id}
 						className='ms-2 text-sm font-medium text-gray-900 lg:whitespace-nowrap'>
-						In Progress
+						Skip
 					</label>
 				</div>
 
