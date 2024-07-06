@@ -372,7 +372,7 @@ const ViewAudit = () => {
 			</div>
 
 			{step == 2 && survey.clientId == user?.client?.id && (
-				<AutoSaveButton action={onFormSubmit} loading={loadingAPI} />
+				// <AutoSaveButton action={onFormSubmit} loading={loadingAPI} />
 			)}
 
 			{fileModal.open && (

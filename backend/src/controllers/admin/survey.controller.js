@@ -8,11 +8,11 @@ const orderBy = { id: 'desc' };
 const schema = Joi.object({
 	clientId: Joi.number().required(),
 	clientName: Joi.string().allow(''),
-	hotelName: Joi.string().allow(''),
-	campaign: Joi.string().allow(''),
-	location: Joi.string().allow(''),
-	startDate: Joi.string().allow(''),
-	endDate: Joi.string().allow(''),
+	hotelName: Joi.string().allow('').allow(null),
+	campaign: Joi.string().allow('').allow(null),
+	location: Joi.string().allow('').allow(null),
+	startDate: Joi.string().allow('').allow(null),
+	endDate: Joi.string().allow('').allow(null),
 	questions: Joi.array(),
 });
 
